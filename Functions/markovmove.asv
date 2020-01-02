@@ -2,7 +2,7 @@
 %% input:  y-> position + speed + ; a->acceleration magnitude; s-> state of markov chain, Mat->cell array of all B matrices;
 %%         T-> transition Matrix 
 
-function [c, s, x1]=markovmove(Mat,y,a,s,T,delta,y1)    %y1->no noise
+function [c, s, x1]=markovmove(Mat,y,a,s,T,delta)
     A=[1 0 delta 0 delta^2/2 0;
            0 1 0 delta 0 delta^2/2;
            0 0 1 0 delta 0;
@@ -87,7 +87,7 @@ function [c, s, x1]=markovmove(Mat,y,a,s,T,delta,y1)    %y1->no noise
 %         end
         
         x=A*y+Mat{s}*a+[0;0;0;0;randn(2,1).*0.02];
-        x1=A*y1+Mat{s}*a;        %only to check how much the noise influences
+        x1=A*y+Mat{s}*a;        %only to check hhow much does the noise influence
         s=markchange(s,T);
         c=x;
 end
