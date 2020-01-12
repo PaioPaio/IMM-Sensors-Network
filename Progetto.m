@@ -19,15 +19,16 @@ A=[1 0 delta 0 delta^2/2 0;
    0 0 0 1 0 delta;
    0 0 0 0 0 0;
    0 0 0 0 0 0];
+G=eye(6);       %better change this to something that makes sense
 
-AB={A,[0;0;0;0;0;0];A,[0;0;0;0;0;1];A,[0;0;0;0;1;0];A,[0;0;0;0;0;-1];A,[0;0;0;0;-1;0]};
+ABG={A,[0;0;0;0;0;0],G;A,[0;0;0;0;0;1],G;A,[0;0;0;0;1;0],G;A,[0;0;0;0;0;-1],G;A,[0;0;0;0;-1;0],G};
     case 2
 end
 
 %Transition Matrix of markov chain
 
 %number of states
-ns=length(AB);
+ns=length(ABG);
 
 %case in which you are costant velocity
 p1=0.8;     %probability of constant speed while being in constant speed
@@ -49,12 +50,13 @@ end
 
 %Senosors grid
 range=50;
-sigma=diag([0.1/3,2*pi/360]);
-sensoreprova=Sensor([0,0],range,sigma);
+R=diag([0.1/3,2*pi/360]);               %sensor covariance
+sensoreprova=Sensor([0,0],range,R);
 
 
 
-
+%Power spectra density of process noise
+Q=diag([0.01,0.01,0.02,0.02,0.05,0.05]);
 %initial state of markov chain
 s=1;
 %initial 2D position, velocity and acceleration
@@ -68,17 +70,17 @@ n=1;
 stato=zeros(6,10);
 statopredicted=zeros(6,10);
 positionsensed=zeros(2,10);
+state
 mode=zeros(1,10);
 x=x0;
 x1=x0;
 H=[1,1;1,1];
 
-
+%initialize sensor Grid
 
 while sensoreprova.inrange
-    [x, s, x1]=markovmove(AB,x,acc,s,Transmat);
+    [x, s, x1]=markovmove(ABG,x,acc,s,Transmat,Q);
     stato(:,n)=x;
-    statopredicted(:,n)=x1;
     sensoreprova.sense(stato(1:2,n));
     mode(n)=s;
     if sensoreprova.sensed(1)==99999 && sensoreprova.sensed(2)==99999
@@ -86,9 +88,6 @@ while sensoreprova.inrange
     else
         positionsensed(:,n)=[cos(sensoreprova.sensed(2));sin(sensoreprova.sensed(2))].*sensoreprova.sensed(1);
     end
-    %H has to be linearized and computed each step since z=f(x) and not z=H*x
-    H=[positionsensed(:,n)'/sensoreprova.sensed(1);...
-       -positionsensed(2,n)/sensoreprova.sensed(1)^2,positionsensed(1,n)/sensoreprova.sensed(1)^2 ]
     
     
     
@@ -100,3 +99,4 @@ figure(1)
 plot(stato(1,1:n),stato(2,1:n))
 hold on
 plot(positionsensed(1,1:n-1),positionsensed(2,1:n-1),'*')
+trackingIMM
