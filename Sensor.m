@@ -46,7 +46,7 @@ classdef Sensor<handle
             if obj.inrange
                 obj.state=x'-obj.position;
                 actualangle=atan2(obj.state(2),obj.state(1));
-                obj.sensed=[sqrt(obj.state*obj.state');actualangle]+randn(2,1).*diag(obj.R);
+                obj.sensed=[sqrt(obj.state*obj.state');actualangle]+randn(2,1).*arrayfun(@(a)sqrt(a),diag(obj.R));
             else
                 obj.sensed=[99999,99999];
             end

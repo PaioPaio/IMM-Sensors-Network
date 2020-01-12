@@ -1,62 +1,64 @@
-function [xkk,Pkk] = IMM(xprev,Pprev,z,Mat,Trans,Q,R,muk,a)
+function [xkk,Pkk,xpred,Ppred,muk1] = IMM(xprev,Pprev,z,Mat,Trans,Q,R,muk,u)
 %xprev->previous iteration estimates, so if we have 5models it will be 5
-%vectors
+%column vectors
 %Pprev->same thing with covariance
 %z->measurement
 %Mat->all the models matices (A,B)
 %Trans->Transition matrix for markovchain
 %Q,R->Respectively model noise covariance/spectral density and measurement noise
 %covariance
-%muk->model probabilities at previous timestep
+%muk->model probabilities at previous timestep, row vector
+%u->acceleration intensity
 
-alto=size(1,Trans);
+alto=size(Trans,1);
 lungo=length(z);
+largo=length(xprev);
 
 %% Reinitialization
 
 mukk=muk*Trans;             %predicted model probabilities at k|k-1
-mudata=zeros(alto);         %mixing probabilities mu(i|j) at k-1
+muij=zeros(alto);         %mixing probabilities mu(i|j) at k-1|k-1    (11.6.6-7)
 for i=1:alto
     for j=1:alto
-        mudata(i,j)=Trans(i,j)*muk(i)/mukk(j);
+        muij(i,j)=Trans(i,j)*muk(i)/mukk(j);
     end
 end
-xmix=zeros(alto);                               %mixing estimate
+xmix=zeros(largo,alto);                               %mixing estimate
 for i=1:alto
     for j=1:alto
-        xmix(:,i)=xmix(:,i)+mudata(i,j)*xprev(:,j);
+        xmix(:,i)=xmix(:,i)+muij(j,i)*xprev(:,j);
     end   
 end
 
-Pmix=zeros(alto,alto,alto);                    %mixing covariance
+Pmix=zeros(largo,largo,alto);                    %mixing covariance
 for i=1:alto
     for j=1:alto
-        Pmix(:,:,i)=Pmix(:,:,i)+(Pprev(:,:,j)+(xmix(j)-xprev(i))*(xmix(j)-xprev(i))')*mudata(i,j);
+        Pmix(:,:,i)=Pmix(:,:,i)+(Pprev(:,:,j)+(xmix(:,j)-xprev(:,i))*(xmix(:,j)-xprev(:,i))')*muij(i,j);
     end
 end
 
 %% Kalman stage
-xpred=zeros(alto);                      %
-Ppred=zeros(alto,alto,alto);             %
+xpred=zeros(largo,alto);                      %
+Ppred=zeros(largo,largo,alto);             %
 S=zeros(lungo,lungo,alto);
-L=cell(zeros(1,alto));
+L=zeros(1,alto);
 
 for i=1:alto
-    [xpred(:,i),Ppred(:,:,i),dz,S(:,:,i)]=kalman(Mat(i),xmix(:,i),a,z,Pmix(:,:,i),Q,R);
-    L(i)=normpdf(dz,0,S).NLogL;
+    [xpred(:,i),Ppred(:,:,i),dz,S(:,:,i)]=kalman(Mat(i,:),xmix(:,i),u,z,Pmix(:,:,i),Q,R);
+    L(i)=-sum(mvnpdf(dz,0,S(:,:,i)));
 end
 
 %% Model probability update
+muk1=zeros(1,alto);
 for i=1:alto
-    muk(i)=mukk(i)*L(i);
+    muk1(i)=mukk(i)*L(i);
 end
-muk=muk./(mukk*L');
+muk1=muk1./(mukk*L');
 
 %%Estimate Fusion
 
-xkk=xpred*muk';
-Pkk=zeros(alto);
+xkk=xpred*muk1';
+Pkk=zeros(largo);
 for i=1:alto
-    Pkk=Pkk+(Ppred(:,:,i)+(xkk-xpred(:,i))*(xkk-xpred(:,i))')*muk(i);
+    Pkk=Pkk+(Ppred(:,:,i)+(xkk-xpred(:,i))*(xkk-xpred(:,i))')*muk1(i);
 end
-
