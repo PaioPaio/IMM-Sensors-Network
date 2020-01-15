@@ -7,7 +7,7 @@ function H=Hk(xprior)
 %H is the linearized z=Hx
 %
 rho=sqrt(xprior(1:2)'*xprior(1:2));
-H=[xprior(1)/rho,xprior(2)/rho,0,0,0,0;...
-    -xprior(2)/rho^2,xprior(1)/rho^2,0,0,0,0];
+H=[xprior(1)/rho,xprior(2)/rho,0,0,;...
+    -xprior(2)/rho^2,xprior(1)/rho^2,0,0];
 end
 
