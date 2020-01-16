@@ -1,4 +1,4 @@
-function [xkk,Pkk,xpred,Ppred,muk1] = IMM(xprev,Pprev,z,Mat,Trans,Q,R,muk,u)
+function [xkk,Pkk,xpred,Ppred,muk1] = IMM(xprev,Pprev,z,Mat,Trans,Q,R,muk,u,caso)
 %xprev->previous iteration estimates, so if we have 5models it will be 5
 %column vectors
 %Pprev->same thing with covariance
@@ -45,7 +45,7 @@ L=zeros(1,alto);
 dz=zeros(2,alto);
 
 for i=1:alto
-    [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat(i,:),xmix(:,i),u,z,Pmix(:,:,i),Q,R);
+    [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat(i,:),xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso);
     L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
 end
 

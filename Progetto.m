@@ -16,13 +16,14 @@ switch caso
     A=[1 0 delta 0;
        0 1 0 delta;
        0 0 1 0;
-       0 0 0 1];    %maybe better 4x4 than 6x6
-    G=eye(4);       %better change this to something that makes sense
+       0 0 0 1];    
+    G=eye(4);       %noise matrix
 
     ABG={A,[0 0 0 0; 0 0 0 0]',G;A,[0 0 0 0;0 delta^2/2 0 delta]',G;A,[delta^2/2 0 delta 0; 0 0 0 0]',G;A,[0 0 0 0;0 -delta^2/2 0 -delta]',G;A,[-delta^2/2 0 -delta 0; 0 0 0 0]',G};
     
-    %number of states
+    %number of markov states
     ns=length(ABG);
+    %length of state vector
     nx=size(A,1);
     
     %Transition Matrix of markov chain
@@ -48,7 +49,7 @@ switch caso
     x0([1,2,4])=1;
     
     %Power spectra density of process noise
-    Q=diag([0.0001,0.0001,0.002,0.002]);  %change obv if you go 4x4
+    Q=diag([0.0001,0.0001,0.002,0.002]);  
     %state of markov chain
     s=1;
     %magnitude of acceleration
@@ -58,7 +59,7 @@ switch caso
     case 2
 end
 
-%Senosors grid
+%Senosors 
 range=20;
 R=diag([0.01/3,(2*pi/360)^2]);               %sensor covariance
 sensoreprova=Sensor([0,0],range,R);
@@ -81,7 +82,6 @@ for i=1:ns
     statopred{i}(:,1)=x0;
     Ppred{i}(:,:,1)=Q;
 end
-
 for i=1:ns
     statopred1(:,i)=x0;
     Ppred1(:,:,i)=Q;
@@ -89,44 +89,128 @@ end
 
 %model probabilities
 mu=zeros(5,10);
-mu(:,1)=[0.95 0.0125 0.0125 0.0125 0.0125]'; %first state is constant velocity for design and we suppose we know
+mu(:,1)=[1 0 0 0 0]'; %first state is constant velocity for design and we suppose we know
 
-%mixed one (output of IMM
+%mixed one (output of IMM), initialize the first one
 statomix=zeros(nx,10);
 Pmix=zeros(nx,nx,10);
 statomix(:,1)=x0;
 Pmix(:,:,1)=Q;
-
+%just for plotting reasons
 positionsensed=zeros(2,10);
 positionsensed(:,1)=x0(1:2);
 polarsensed=zeros(2,10);
 
 %initialize sensor Grid
-% for i=1:10
-%     for j=1:10
-%         
-%     end
-% end
+nq=10;      %grid's size (even number plez)
+sensors=num2cell(zeros(nq));
+for i=1:nq
+    for j=1:nq
+        sensors{i,j}=Sensor([(-nq/2+i)*range,(-nq/2+j)*range],range,R,[i,j]);
+    end
+end
+for i=1:nq
+    for j=1:nq
+        for i1=-1:1
+            for j1=-1:1
+                if (i+i1<1||i+i1>nq||j+j1<1||j+j1>nq)
+                     continue;
+                else
+                    sensors{i,j}.addlistener(sensors{i+i1,j+j1});
+                    sensors{i,j}.neighboors(end+1)=[i+i1,j+j1];
+                end
+            end
+        end
+    end
+end
+
 
 while sensoreprova.inrange
     x=move(ABG,stato(:,n),acc,mode(n),Q);   
     mode(n+1)=markchange(s,Transmat);
     stato(:,n+1)=x;
     sensoreprova.sense(stato(1:2,n+1));
-    if sensoreprova.sensed(1)==99999 && sensoreprova.sensed(2)==99999
+    if sensoreprova.inrange==false
         break
     else
         %these arrays will be one element shorter
         polarsensed(:,n)=sensoreprova.sensed;
         positionsensed(:,n+1)=[cos(sensoreprova.sensed(2));sin(sensoreprova.sensed(2))].*sensoreprova.sensed(1);
     end
-    [statomix(:,n+1),Pmix(:,:,n+1),statopred1,Ppred1,mu(:,n+1)]=IMM(statopred1,Ppred1,sensoreprova.sensed,ABG,Transmat,Q,R,mu(:,n)',acc);
+    [statomix(:,n+1),Pmix(:,:,n+1),statopred1,Ppred1,mu(:,n+1)]=IMM(statopred1,Ppred1,sensoreprova.sensed,ABG,Transmat,Q,R,mu(:,n)',acc,caso);
     for i=1:ns
         statopred{i}(:,n+1)=statopred1(:,i);
         Ppred{i}(:,:,n+1)=Ppred1(:,:,i);
     end
     
     n=n+1;
+end
+ 
+%%
+
+onindices={};     %active vertexes indices
+mini=999;
+minj=999;
+%initialize onindices with x0
+for i=1:nq
+    for j=1:nq
+        sensors{i,j}.inRange(stato(1:2,1));
+        if sensors{i,j}.inrange
+            onindices(end+1)=[i,j];
+            if i<mini
+                mini=i;
+            end
+            if j<minj
+                minj=j;
+            end
+            maxi=i;
+            maxj=j;
+        end
+    end
+end
+idlerange=[mini,maxi;minj,maxj];
+
+
+while (any([sensors{:,:}.inrange])&&n<1000)
+    x=move(ABG,stato(:,n),acc,mode(n),Q);   
+    mode(n+1)=markchange(s,Transmat);
+    stato(:,n+1)=x;
+    %check of all idle sensors if any of them is now in range
+    for i=idlerange(1,1):idlerange(1,2)
+        for j=idlerange(2,1):idlerange(2,2)
+            sensors{i,j}.inRange(stato(1:2,n+1));
+            check=checkvertex(onindices,[i,j]);
+            if sensors{i,j}.inrange
+                %add to onindices if it's in range
+                if ~any(check)
+                    onindices(end+1)=[i,j];
+                    sensors{i,j}.initializefromidle(sensors)
+                    %the sensors doesn't have anything to compute the IMM,
+                    %we initialize it getting everything from it's
+                    %neighboors that are on
+                end
+            else
+                %kick out of onindices if it's not in range
+                if any(check)
+                    onindices(logical(checkvertex(onindices,[i,j])))=[];
+                end
+            end
+        end
+    end
+    
+    for i=1:length(onindices)
+        %get indices from onindices cell array
+        kk=onindices{i}(1);
+        ll=onindices{i}(2);
+        sensors{kk,ll}.sense(stato(1:2,n+1));
+        %IMM for each sensor on
+        
+        [sensors{kk,ll}.xmix,sensors{kk,ll}.Pmix...
+        ,sensors{kk,ll}.xpred,sensors{kk,ll}.Ppred,sensors{kk,ll}.mu]...
+        =IMM(sensors{kk,ll}.xpred,sensors{kk,ll}.Ppred,...
+        sensors{kk,ll}.sensed,ABG,Transmat,Q,sensors{kk,ll}.R,sensors{kk,ll}.mu',acc,caso);
+    
+    end
 end
 
 
