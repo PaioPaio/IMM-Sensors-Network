@@ -11,9 +11,11 @@ classdef Sensor<handle
        inrange=false             %pretty selfexplanatory
        state {}                 %on/idle/off
        neighboors {}            %cell array with indices of listeners/sources
-       activevertex{}         %active graph indices
+       activevertex{}           %active graph indices
        
-       Slistener {}              %element of another class to handle the events
+       change {}                
+       %token that should be -1 if a neighboor has gone from ON to IDLE,
+       % 1 if it has gone from IDLE to ON, 0 in any other case
        
        xmix {}                  %state result of IMM filter estimation
        Pmix {}                  %covariance result o IMM filter estimation
@@ -26,14 +28,6 @@ classdef Sensor<handle
        
     end
     
-    events
-        %signal sent to all the listeners of this sensor (all it's
-        %neighboors) when there's a change of state from on to idle or
-        %viceversa
-        Cansense
-        Cannotsense
-    end
-    
     methods
         
         %generating function
@@ -41,30 +35,27 @@ classdef Sensor<handle
             obj.position=position;
             obj.range=range;
             obj.R=sigma;
-            obj.state="idle";
+            obj.state="off";
             if nargin<4
                 obj.ingrid=[0,0];
             else
                 obj.ingrid=grid;
             end
             obj.sensed=[0,0];               %starts as [0,0]
+            obj.neighboors={};
         end
         
         %to check if in range of the object moving and to change status
         function obj=inRange(obj,x)
-            if (obj.state=="on"||obj.state=="idle")
-                distance=sqrt((obj.position-x')*(obj.position-x')');
-                if distance>obj.range
-                    obj.inrange=false;
-                    notify(obj,'Cannotsense');          %event to notify
+            distance=sqrt((obj.position-x')*(obj.position-x')');
+            if distance>obj.range
+                obj.inrange=false;
+                if obj.state=="on"
                     obj.state="idle";
-                else
-                    obj.inrange=true;
-                    notify(obj,'Cansense');
-                    obj.state="on";
                 end
             else
-                debugMsgObj("Something went wrong, off sensors shouldn't call inRange()",obj);
+                obj.inrange=true;
+                obj.state="on";
             end
         end
     
@@ -74,11 +65,29 @@ classdef Sensor<handle
             %moving object
             inRange(obj,x);
             if obj.inrange
-                obj.state=x'-obj.position;
-                actualangle=atan2(obj.state(2),obj.state(1));
-                obj.sensed=[sqrt(obj.state*obj.state');actualangle]+randn(2,1).*arrayfun(@(a)sqrt(a),diag(obj.R));
+                vector=x'-obj.position;
+                actualangle=atan2(vector(2),vector(1));
+                obj.sensed=[sqrt(vector*vector');actualangle]+randn(2,1).*arrayfun(@(a)sqrt(a),diag(obj.R));
             else
                 obj.sensed=[99999,99999];
+            end
+        end
+        
+        function obj=checkchange(obj)
+            if obj.change==1
+                %if some sensor nearby has turned on then switch to idle
+                if obj.state=="off"
+                    obj.state="idle";
+                end
+                obj.change=0;
+            elseif obj.change==-1
+                %if some sensor nerby has turned off, and you see that no
+                %other sensor nearby is on, then turn off
+                a=checkvertex(obj.activevertex,obj.neighboors);
+                if obj.state=="idle" && ~any(a,'all')
+                    obj.state="off";
+                end
+                
             end
         end
         
@@ -90,21 +99,31 @@ classdef Sensor<handle
         function obj=initializefromidle(obj,sensorgrid)
             %obj->sensor,   sensorgrid->the whole sensor grid
             %check which neighboors are on
+            n=1;
+            %again matlab sucks with all these temp stuff
+            indic=obj.activevertex{1};
+            lungstato=length(sensorgrid{indic(1),indic(2)}.xmix);
+            wantxmix=zeros(lungstato,1);
+            wantcovmix=zeros(lungstato,lungstato,1);
+            
+            wantxpred={};
+            wantPpred={};
+            wantmu={};
             for i=1:length(obj.neighboors)
-                %temp sensor with neighboor's indices
+                %temp sensor with neighboor's indices cause matlab sucks
                 gigi=sensorgrid{obj.neighboors{i}(1),obj.neighboors{i}(2)};
                 if gigi.state=="on"
                     %final state and covariance estimate
-                    wantxmix(:,end+1)=gigi.xmix;
-                    wantcovmix(:,:,end+1)=gigi.Pmix;
+                    wantxmix(:,n)=gigi.xmix;
+                    wantcovmix(:,:,n)=gigi.Pmix;
                     %all the kalman estimates
-                    wantxpred{end+1}(:,:)=gigi.xpred;
-                    wantPpred{end+1}(:,:,:)=gigi.Ppred;
-                    wantmu{end+1}(1,:)=gigi.mu;
+                    wantxpred{n}(:,:)=gigi.xpred;
+                    wantPpred{n}(:,:,:)=gigi.Ppred;
+                    wantmu{n}(:)=gigi.mu;
+                    n=n+1;
                 end
             end
             nummarkov=size(wantPpred{1},3);
-            lungstato=size(wantPpred{1},2);
             numsensors=length(wantPpred);
             %do WLS from all the data of the on neighboors
             
@@ -123,47 +142,15 @@ classdef Sensor<handle
             zpred=reshape(cell2mat(wantxpred),[numsensors*lungstato,nummarkov]);
             Cpred={};
             for j=1:nummarkov
+                Cpred{j}=[];
                 for i=1:numsensors
                     Cpred{j}=blkdiag(Cpred{j},wantPpred{i}(:,:,i));
                 end
             end
             obj.mu=mean(reshape(cell2mat(wantmu),[numsensors,nummarkov]),1);
             for j=1:nummarkov
-                [obj.xpred(:,j),obj.Pred(:,:,j)]=WLS(zpred(:,j),Cpred{j},Hmix);
+                [obj.xpred(:,j),obj.Ppred(:,:,j)]=WLS(zpred(:,j),Cpred{j},Hmix);
             end
-        end
-        
-        
-        %add the listener for both events
-        function obj=addlistener(obj,source)
-            %add the ability to sense both events can/cant sense sent from 
-            addlistener1(source);
-            addlistener2(source);
-            obj.neighboors{end+1}=source.ingrid;
-        end
-        function obj=addlistener1(obj,source)
-            listener(source,'Cansense',@Sensor.handleEvent1);
-        end
-        function obj=addlistener2(obj,source)
-            listener(source,'Cannotsense',@Sensor.handleEvent2);
-        end
-    end
-    
-    %callback functions for events
-    methods (Static)
-        function obj=handleEvent1(obj,source)
-            %event Cansense
-            if obj.state=="off"
-                obj.state="idle"; 
-            end
-        end
-        function obj=handleEvent2(obj,source)
-            %event Cannotsense
-            a=checkvertex(obj.activevertex,obj.neighboors);
-            if obj.state=="idle"&& ~any(a)
-                obj.state="off";
-            end
-            
         end
     end
     

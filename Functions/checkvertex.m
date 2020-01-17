@@ -16,7 +16,7 @@ if iscell(arr)
             for j=1:size(cellarr,2)     
                 if cellarr{k,j}==arr1
                     A(i,k,j)=1;
-                    indic(end+1)=[k,j];
+                    indic{end+1}=[k,j];
                 end
             end
         end
@@ -28,7 +28,7 @@ else
         for j=1:size(cellarr,2)     
             if cellarr{i,j}==arr
                 A(i,j)=1;
-                indic(end+1)=[i,j];
+                indic{end+1}=[i,j];
             end
         end
     end

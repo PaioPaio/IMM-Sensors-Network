@@ -1,7 +1,8 @@
-function [xkk,Pkk,xpred,Ppred,muk1] = IMM(xprev,Pprev,z,Mat,Trans,Q,R,muk,u,caso)
+function [xkk,Pkk,xpred,Ppred,muk1] = IMM(xprev,Pprev,offset,z,Mat,Trans,Q,R,muk,u,caso)
 %xprev->previous iteration estimates, so if we have 5models it will be 5
 %column vectors
 %Pprev->same thing with covariance
+%offset->position of sensor from where you measured
 %z->measurement
 %Mat->all the models matices (A,B)
 %Trans->Transition matrix for markovchain
@@ -45,7 +46,7 @@ L=zeros(1,alto);
 dz=zeros(2,alto);
 
 for i=1:alto
-    [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat(i,:),xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso);
+    [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat(i,:),xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso,offset);
     L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
 end
 
@@ -62,4 +63,5 @@ xkk=xpred*muk1';
 Pkk=zeros(largo);
 for i=1:alto
     Pkk=Pkk+(Ppred(:,:,i)+(xkk-xpred(:,i))*(xkk-xpred(:,i))')*muk1(i);
+end
 end
