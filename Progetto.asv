@@ -185,7 +185,7 @@ outskirt=idlerange;
 zsens=[];
 Psens=[];
 
-while (any(forall(sensors,'inrange'))&&n<1000)
+while (any(forall(sensors,'inrange'){)&&n<1000)
     x=move(ABG,stato(:,n),acc,mode(n),Q);   
     mode(n+1)=markchange(s,Transmat);
     stato(:,n+1)=x;

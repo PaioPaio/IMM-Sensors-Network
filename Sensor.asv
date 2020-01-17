@@ -134,7 +134,7 @@ classdef Sensor<handle
         end
         
         
-        %add the listener for both events
+        %add t
         function obj=addlistener(obj,source)
             %add the ability to sense both events can/cant sense sent from 
             addlistener1(source);
@@ -149,16 +149,15 @@ classdef Sensor<handle
         end
     end
     
-    %callback functions for events
     methods (Static)
         function obj=handleEvent1(obj,source)
-            %event Cansense
+            %callback function forthe event Cansense
             if obj.state=="off"
                 obj.state="idle"; 
             end
         end
         function obj=handleEvent2(obj,source)
-            %event Cannotsense
+            %callback function for the event Cannotsense
             a=checkvertex(obj.activevertex,obj.neighboors);
             if obj.state=="idle"&& ~any(a)
                 obj.state="off";

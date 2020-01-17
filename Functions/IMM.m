@@ -56,7 +56,7 @@ for i=1:alto
 end
 muk1=muk1./(mukk*L');
 
-%%Estimate Fusion
+%% Estimate Fusion
 
 xkk=xpred*muk1';
 Pkk=zeros(largo);

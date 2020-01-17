@@ -1,0 +1,9 @@
+function H = deblock(Hbig,blocksize)
+    len=size(Hbig,1);
+    len1=len/blocksize;
+    H=Hbig(1:blocksize,1:blocksize);
+    for i=1:len1
+        H(=
+    end
+end
+

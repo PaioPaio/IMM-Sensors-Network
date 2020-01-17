@@ -3,5 +3,5 @@
 %%         T-> transition Matrix 
 
 function x1=move(Mat,x,a,s,Q)    %y1->no noise
-        x1=Mat{s,1}*x+Mat{s,2}*a+Mat{s,3}*randn(size(Mat{s,1},1),1).*arrayfun(@(a)sqrt(a),diag(Q));  %the real one (noise on acceleration)
+        x1=Mat{s,1}*x+Mat{s,2}*a+Mat{s,3}*randn(size(Mat{s,1},1),1).*arrayfun(@(a)sqrt(a),diag(Q)); 
 end
