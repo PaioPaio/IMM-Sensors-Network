@@ -68,6 +68,7 @@ classdef Sensor<handle
                 vector=x'-obj.position;
                 actualangle=atan2(vector(2),vector(1));
                 obj.sensed=[sqrt(vector*vector');actualangle]+randn(2,1).*arrayfun(@(a)sqrt(a),diag(obj.R));
+            else
             end
         end
         

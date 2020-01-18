@@ -51,13 +51,12 @@ switch caso
     %Power spectra density of process noise
     Q=diag([0.001,0.001,0.005,0.005]);  
     %magnitude of acceleration
-    acc=[1;1].*1;
+    acc=[1;1].*3;
     
     case 2
 end
 %state of markov chain
-%s=randi([1,ns]);
-s=1;
+s=randi([1,ns]);
 
 %Senosors 
 range=10;
@@ -218,7 +217,7 @@ Psens=[];
 Hsens=[];
 musens=[];
 
-while (~(isempty(onindices))&&n<10000)
+while (any(forall(sensors),'all')&&n<1000)
     x=move(ABG,stato(:,n),acc,mode(n),Q);   
     mode(n+1)=markchange(s,Transmat);
     stato(:,n+1)=x;
@@ -252,16 +251,12 @@ while (~(isempty(onindices))&&n<10000)
     end
     
     lon=length(onindices);
-    if lon==0
-        break
-    end
     for i=1:lon
-        mini=max([1,min([onindices{i}(1)-1,mini])]);
-        minj=max([1,min([onindices{i}(2)-1,minj])]);
-        maxi=min([nq,max([onindices{i}(1)+1,maxi])]);
-        maxj=min([nq,max([onindices{i}(2)+1,maxi])]);
+        
+        mini=max(min(onindice));
     end
-
+    
+    mini=cell2mat
     
     idlerange=[mini,maxi;minj,maxj];
     

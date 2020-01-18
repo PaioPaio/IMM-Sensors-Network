@@ -22,6 +22,5 @@ elseif message=="Cannot"
         grid{gigi(1),gigi(2)}.checkchange;
     end
 end
-
 end
 
