@@ -51,10 +51,7 @@ for i=1:alto
 end
 
 %% Model probability update
-muk1=zeros(1,alto);
-for i=1:alto
-    muk1(i)=mukk(i)*L(i);
-end
+muk1=mukk.*L;
 muk1=muk1./(mukk*L');
 
 %% Estimate Fusion

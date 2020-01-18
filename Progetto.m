@@ -35,7 +35,7 @@ switch caso
     v1=[p1 p p p p];
     v2=[q1 2*q q 2*q];
 
-    %the matrix is "circulant" (trova termine migliore) so we can build it
+    %the matrix is "circulant" from so we can build it
     %algorithmically
     Transmat=zeros(ns);
     Transmat(1,:)=v1;
@@ -343,11 +343,7 @@ end
 plot(statocons(1,1:n),statocons(2,1:n))
 hold off
 
-diffmeas=positionsensed-stato(1:2,1:n);
-for i=1:n
-    rmsmeas(i)=norm(diffmeas(:,i));
-end
-diff=statomix-stato(:,1:n);
+diff=statocons-stato(:,1:n);
 for i=1:n
     rmspos(i)=norm(diff(1:2,i));
     rmsvel(i)=norm(diff(3:4,i));
@@ -355,7 +351,4 @@ end
 
 figure(2)
 plot(rmspos)
-hold on
-plot(rmsmeas)
-hold off
 
