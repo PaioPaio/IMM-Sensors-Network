@@ -27,8 +27,8 @@ switch caso
     nx=size(A,1);
     
     %Transition Matrix of markov chain
-    p1=0.8;     %probability of constant speed while being in constant speed
-    q1=0.6;     %probability of still accelerating forward while accelerating forward
+    p1=0.7;     %probability of constant speed while being in constant speed
+    q1=0.4;     %probability of still accelerating forward while accelerating forward
     backcost=0.2;
     p=(1-p1)/4;
     q=(1-q1-backcost)/5;
@@ -46,7 +46,7 @@ switch caso
     
     %initial 2D position, velocity and acceleration
     x0=zeros(nx,1);
-    x0([1,2,4])=1;
+    x0([1,2,4])=0.5;
     
     %Power spectra density of process noise
     Q=diag([0.001,0.001,0.005,0.005]);  
@@ -65,7 +65,7 @@ R=diag([0.01/3,(2*pi/360)^2]);               %sensor covariance
 % sensoreprova=Sensor([0,0],range,R);
 
 %real state and mode
-n=1;
+% n=1;
 stato=zeros(nx,10); %vector of the real state of the moving object
 mode=zeros(1,10);   %vector of the real mode of the moving object
 stato(:,1)=x0;
@@ -235,7 +235,7 @@ while (~(isempty(onindices))&&n<10000)
                     onindices{end+1}=[i,j];
                     %send your neighboors a message that you are now on
                     tellyourfriends(sensors{i,j},sensors,"Can");
-                    sensors{i,j}.initializefromidle(sensors)
+                    sensors{i,j}.initializefromidle(sensors);
                     %the sensors doesn't have anything to compute the IMM,
                     %we initialize them getting everything from their
                     %neighboors that are on
