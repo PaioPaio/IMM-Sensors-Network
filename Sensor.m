@@ -101,12 +101,14 @@ classdef Sensor<handle
         function obj=initializefromidle(obj,sensorgrid)
             %obj->sensor,   sensorgrid->the whole sensor grid
             %check which neighboors are on
-            n=1;
             %again matlab sucks with all these temp stuff
             indic=obj.activevertex{1};
+            
             lungstato=length(sensorgrid{indic(1),indic(2)}.xmix);
             nummarkov=size(sensorgrid{indic(1),indic(2)}.Ppred,3);
-            xmix1=[];
+            numsensors=length(obj.activevertex);
+            
+            xcons1=[];
             covmix=[];
             
             xpred1=[];
@@ -116,30 +118,26 @@ classdef Sensor<handle
             Hcons=[];
             Hmu=[];
             
-            for i=1:length(obj.neighboors)
-                %temp sensor with neighboor's indices cause matlab sucks
-                gigi=sensorgrid{obj.neighboors{i}(1),obj.neighboors{i}(2)};
-                if gigi.state=="on"
-                    %final state and covariance estimate
-                    xmix1=[xmix1;gigi.xmix];
-                    covmix=blkdiag(covmix,gigi.Pmix);
-                    %all the kalman estimates
-                    xpred1=[xpred1;gigi.xpred];
-                    wantPpred{n}(:,:,:)=gigi.Ppred;
-                    mu1=[mu1;gigi.mu];
-                    muijg=blkdiag(muijg,gigi.muij);
-                    Hcons=[Hcons;eye(lungstato)];
-                    Hmu=[Hmu;eye(nummarkov)];
-                    n=n+1;
-                end
+            for i=1:length(obj.activevertex)
+                kk=obj.activevertex{i}(1);
+                ll=obj.activevertex{i}(2);
+                %final state and covariance estimate
+                xcons1=[xcons1;sensorgrid{kk,ll}.xcons];
+                covmix=blkdiag(covmix,sensorgrid{kk,ll}.Pcons);
+                %all the kalman estimates
+                xpred1=[xpred1;sensorgrid{kk,ll}.xpred];
+                wantPpred{i}(:,:,:)=sensorgrid{kk,ll}.Ppred;
+                mu1=[mu1;sensorgrid{kk,ll}.mu];
+                muijg=blkdiag(muijg,sensorgrid{kk,ll}.muij);
+                Hcons=[Hcons;eye(lungstato)];
+                Hmu=[Hmu;eye(nummarkov)];
             end
-            numsensors=n-1;
             %do WLS from all the data of the on neighboors
             
             %the final result of the IMM
             %H is gonna be a stacked matrix of identities since our measure
             %is exactly zmix
-            [obj.xcons,obj.Pcons]=WLS(xmix1,covmix,Hcons);
+            [obj.xcons,obj.Pcons]=WLS(xcons1,covmix,Hcons);
             [obj.mu,obj.muij]=WLS(mu1,muijg,Hmu);
             %kalman
             for j=1:nummarkov
@@ -148,6 +146,7 @@ classdef Sensor<handle
                     Cpred=blkdiag(Cpred,wantPpred{i}(:,:,j));
                 end
                 [obj.xconskalm(:,j),obj.Pconskalm(:,:,j)]=WLS(xpred1(:,j),Cpred,Hcons);
+                [obj.xpred(:,j),obj.Ppred(:,:,j)]=WLS(xpred1(:,j),Cpred,Hcons);
             end
         end
     end

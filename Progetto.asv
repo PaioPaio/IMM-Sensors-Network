@@ -51,13 +51,14 @@ switch caso
     %Power spectra density of process noise
     Q=diag([0.2,0.2]);  
     %magnitude of acceleration
-    acc=[1;1].*3;
+    acc=[1;1].*1;
     
     case 2
 end
 %state of markov chain
-%s=randi([1,ns]);
-s=1;
+s=randi([1,ns]);
+howconfident=0.9;
+% s=1;
 
 %Senosors 
 range=10;
@@ -73,9 +74,15 @@ mode(1)=s;
 P0=diag([0.01,0.01,0.005,0.005]);
 
 %mu1 is the starting vector of probabilities for the imm
-% mu1=zeros(1,ns);
-% mu1(s)=1;
-mu1=[0.9 0.25 0.25 0.25 0.25]';
+mu1=zeros(ns,1);
+for i=1:ns
+    if i==s
+        mu1(i)=howconfident;
+    else
+        mu1(i)=(1-howconfident)/(ns-1);
+    end
+end
+% mu1=[0.9 0.25 0.25 0.25 0.25]';
 % sensoreprova.inRange(stato(1:2,1));
 
 
@@ -133,7 +140,7 @@ mu(:,1)=mu1'; %first state is constant velocity for design and we suppose we kno
 %%
 
 %initialize sensor Grid
-nq=10;      %grid's size (even number plez)
+nq=20;      %grid's size (even number plez)
 sensors=num2cell(zeros(nq));
 %basic sensor proprieties
 for i=1:nq
@@ -250,20 +257,25 @@ while (~(isempty(onindices))&&n<10000)
                 %add to onindices if it's in range and not already in the
                 %list
                 if ~any(check,'all')
-                    onindices{end+1}=[i,j];
-                    %send your neighboors a message that you are now on
-                    tellyourfriends(sensors{i,j},sensors,"Can");
+                    
+                    sensors{i,j}.activevertex=onindices;
                     sensors{i,j}.initializefromidle(sensors);
                     %the sensors doesn't have anything to compute the IMM,
                     %we initialize them getting everything from their
                     %neighboors that are on
+                    
+                    onindices{end+1}=[i,j];
+                    sensors{i,j}.activevertex=onindices;
+                    %send your neighboors a message that you are now on
+                    tellyourfriends(sensors{i,j},sensors,"Can");
                 end
             elseif ~sensors{i,j}.inrange
                 %kick out of onindices if it's not in range
                 if any(check,'all')
                     %send your neighboors a message that you are now idle
-                    tellyourfriends(sensors{i,j},sensors,"Cannot");
                     onindices(logical(checkvertex(onindices,[i,j])))=[];
+                    sensors{i,j}.activevertex=onindices;
+                    tellyourfriends(sensors{i,j},sensors,"Cannot");
                 end
             end
         end
