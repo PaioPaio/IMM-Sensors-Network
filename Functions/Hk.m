@@ -13,5 +13,9 @@ switch caso
         H=[vector(1)/rho,vector(2)/rho,0,0,;...
             -vector(2)/rho^2,vector(1)/rho^2,0,0];
     case 2
+         vector=xprior(1:2)'-offset;
+        rho=sqrt(vector*vector');
+        H=[vector(1)/rho,vector(2)/rho,0,0,0,0;...
+            -vector(2)/rho^2,vector(1)/rho^2,0,0,0,0];
 end
 end

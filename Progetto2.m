@@ -6,9 +6,10 @@ clc; clear all; close all;
 %1-> markov chain constant speed or costant acceleration
 %2-> unicycle
 
-caso=1;
+caso=2;
 %delta time
-delta=0.1;
+delta=1;
+phi=-pi/2;
 
 %Cell matrix of various B for the input
 switch caso
@@ -52,8 +53,55 @@ switch caso
     Q=diag([0.2,0.2]);  
     %magnitude of acceleration
     acc=[1;1].*1;
-    
+    P0=diag([0.01,0.01,0.005,0.005]);
     case 2
+        % Unycicle
+    A=[1 0 0 delta 0 0;
+       0 1 0 0 delta 0;
+       0 0 1 0 0 delta;
+       0 0 0 1 0 0;
+       0 0 0 0 1 0;
+       0 0 0 0 0 1];
+    G= [delta^2/2 0 0 0 0 0 ; 0 delta^2/2 0 0 0 0]';
+    ABG={A,[0 0 0 0 0 0; 0 0 0 0 0 0]',G;...
+        A,[0 0 0 0 0 0; delta^2*cos(phi)/2 delta^2*sin(phi)/2 0 delta*cos(phi) delta*sin(phi) 0]',G;...
+        A,[0 0 0 0 0 0; -delta^2*cos(phi)/2 -delta^2*sin(phi)/2 0 -delta*cos(phi) -delta*sin(phi) 0]',G;...
+        A,[0 0 delta^2/2 0 0 delta;0 0 0 0 0 0]',G;...
+        A,[0 0 -delta^2/2 0 0 -delta;0 0 0 0 0 0]',G};
+      
+    ns=length(ABG);
+    %length of state vector
+    nx=size(A,1);
+    
+    %Transition Matrix of markov chain
+    p1=0.7;     %probability of constant speed while being in constant speed
+    q1=0.4;     %probability of still accelerating forward while accelerating forward
+    backcost=0.2;
+    p=(1-p1)/4;
+    q=(1-q1-backcost)/5;
+    v1=[p1 p p p p];
+    v2=[q1 2*q q 2*q];
+
+    %the matrix is "circulant" from so we can build it
+    %algorithmically
+    Transmat=zeros(ns);
+    Transmat(1,:)=v1;
+    Transmat(2:end,1)=ones(4,1).*backcost;
+    for i=2:ns
+        Transmat(i,2:end)=[v2(end+3-i:end),v2(1:end+2-i)];
+    end
+    
+    %initial 2D position, velocity and acceleration
+    x0=zeros(nx,1);
+    x0([1,2,4,6])=0.5;
+    x0(3)=-pi/2;
+    phi=x0(3);
+    
+    %Power spectra density of process noise
+    Q=diag([0.2,0.2]);  
+    %magnitude of acceleration
+    acc=[1;1].*1;
+    P0=diag([0.01,0.01,0.005,0.005,0.005,0.005]);
 end
 %state of markov chain
 s=randi([1,ns]);
@@ -71,7 +119,7 @@ stato=zeros(nx,10); %vector of the real state of the moving object
 mode=zeros(1,10);   %vector of the real mode of the moving object
 stato(:,1)=x0;
 mode(1)=s;
-P0=diag([0.01,0.01,0.005,0.005]);
+
 
 %mu1 is the starting vector of probabilities for the imm
 mu1=zeros(ns,1);
@@ -242,11 +290,20 @@ muijsens=[];
 xksens=[];
 Pksens=cell(1,lon);
 
+xgrid=-range*nq/2:range:range*nq/2;
+ygrid=xgrid;
+
+figure(1)
+for i=1:nq+1 
+    plot(xgrid,ones(1,nq+1).*ygrid(i),'*r') 
+end 
+hold on
 
 while (~(isempty(onindices))&&n<10000)
     x=move(ABG,stato(:,n),acc,mode(n),Q);   
     mode(n+1)=markchange(s,Transmat);
     stato(:,n+1)=x;
+    phi=x(3);
     %check of all idle sensors if any of them is now in range
     
     for i=idlerange(1,1):idlerange(1,2)
@@ -389,29 +446,51 @@ while (~(isempty(onindices))&&n<10000)
     xksens=[];
     Pksens=cell(1,lon);
     muijsens=[];
-    
+    plot(stato(1,n),stato(2,n),'ro')
     n=n+1;
 end
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%% Plot Zone %%%%%%%%%%%%%%%%%%
+hold off
 xgrid=-range*nq/2:range:range*nq/2;
 ygrid=xgrid;
 
-figure(1)
-plot(stato(1,1:n),stato(2,1:n))
-hold on
-for i=1:nq+1
-    plot(xgrid,ones(1,nq+1).*ygrid(i),'*r')
-end
-%plot(positionsensed(1,1:n-1),positionsensed(2,1:n-1),'*')
-plot(statocons(1,1:n),statocons(2,1:n))
-hold off
 
-diff=statocons-stato(:,1:n);
-for i=1:n
-    rmspos(i)=norm(diff(1:2,i));
-    rmsvel(i)=norm(diff(3:4,i));
-end
+curve1 = animatedline('Color','r'); 
+curve2= animatedline; 
+ 
+figure(2) 
+hold on 
+ for i=1:nq+1 
+     plot(xgrid,ones(1,nq+1).*ygrid(i),'*r') 
+ end 
+for i=1:n 
+     addpoints(curve1,stato(1,i),stato(2,i)) 
+     drawnow 
+    addpoints(curve2,statocons(1,i),statocons(2,i)) 
+    drawnow 
+end 
+hold off 
+% plot utilizzando maggiore degli outskirt e il minore 
+figure(3) 
+plot(stato(1,1:n),stato(2,1:n)) 
+hold on 
+for i=1:nq+1 
+    plot(xgrid,ones(1,nq+1).*ygrid(i),'*r') 
+end 
+%plot(positionsensed(1,1:n-1),positionsensed(2,1:n-1),'*') 
+plot(statocons(1,1:n),statocons(2,1:n)) 
+hold off 
+ 
+diff=statocons-stato(:,1:n); 
+for i=1:n 
+    rmspos(i)=norm(diff(1:2,i)); 
+    rmsvel(i)=norm(diff(3:4,i)); 
+end 
+ 
+figure(4) 
+plot(rmspos) 
 
-figure(2)
-plot(rmspos)
-
+figure(5)
+plot(stato(3,1:n))
+ 
