@@ -48,11 +48,9 @@ dz=zeros(lungo,alto);
 for i=1:alto
     [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat(i,:),xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso,offset);
     %% to avoid error => threshold 
-    if S(:,:,i)< 0.001
-       S(:,:,i)=0.001;
-    end    
+    if
     L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
-    
+    end
 end
 
 %% Model probability update

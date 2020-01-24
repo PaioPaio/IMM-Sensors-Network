@@ -6,7 +6,7 @@ clc; clear all; close all;
 %1-> markov chain constant speed or costant acceleration
 %2-> unicycle
 
-caso=1;
+caso=2;
 %delta time
 delta=0.2;
 phi=-pi/2;
@@ -28,8 +28,8 @@ switch caso
     nx=size(A,1);
     
     %Transition Matrix of markov chain
-    p1=0.7;     %probability of constant speed while being in constant speed
-    q1=0.4;     %probability of still accelerating forward while accelerating forward
+    p1=0.6;     %probability of constant speed while being in constant speed
+    q1=0.5;     %probability of still accelerating forward while accelerating forward
     backcost=0.2;
     p=(1-p1)/4;
     q=(1-q1-backcost)/5;
@@ -62,7 +62,7 @@ switch caso
        0 0 0 1 0 0;
        0 0 0 0 1 0;
        0 0 0 0 0 1];
-    G= [delta^2/2 0 0 0 0 0 ; 0 delta^2/2 0 0 0 0]';
+    G= [delta^2/2 0 0 delta 0 0 ; 0 delta^2/2 0 0 delta 0]'; % secondo me non ci va delta , ma funziona meglio
     ABG={A,[0 0 0 0 0 0; 0 0 0 0 0 0]',G;...
         A,[0 0 0 0 0 0; delta^2*cos(phi)/2 delta^2*sin(phi)/2 0 delta*cos(phi) delta*sin(phi) 0]',G;...
         A,[0 0 0 0 0 0; -delta^2*cos(phi)/2 -delta^2*sin(phi)/2 0 -delta*cos(phi) -delta*sin(phi) 0]',G;...
@@ -100,7 +100,7 @@ switch caso
     %Power spectra density of process noise
     Q=diag([0.2,0.2]);  
     %magnitude of acceleration
-    acc=[1;1].*1;
+    acc=[1;1].*0.01;
     P0=diag([0.01,0.01,0.005,0.005,0.005,0.005]);
 end
 %state of markov chain
@@ -293,11 +293,11 @@ Pksens=cell(1,lon);
 xgrid=-range*nq/2:range:range*nq/2;
 ygrid=xgrid;
 
-% % % % % % % % % figure(1)
-% % % % % % % % % for i=1:nq+1 
-% % % % % % % % %     plot(xgrid,ones(1,nq+1).*ygrid(i),'*r') 
-% % % % % % % % % end 
-% % % % % % % % % hold on
+figure(1)
+for i=1:nq+1 
+    plot(xgrid,ones(1,nq+1).*ygrid(i),'*r') 
+end 
+hold on
 
 while (~(isempty(onindices))&&n<10000)
     x=move(ABG,stato(:,n),acc,mode(n),Q);   
@@ -435,8 +435,8 @@ while (~(isempty(onindices))&&n<10000)
             [sensors{kk,ll}.xconskalm(:,i),sensors{kk,ll}.Pconskalm(:,:,i)]=WLS(xksens(:,i),Pkksens,Hsens);
         end
     end
-    if rem(n,10)==0
-    [ell_x,ell_y] =plotellipse(Pkksens,stato,n,0);
+    if rem(n,5)==0
+    [ell_x,ell_y] =plotellipse(Pkksens,stato,n,1);
     ellx(:,n)=ell_x(:);
     elly(:,n)=ell_y(:);
     end
@@ -449,13 +449,13 @@ while (~(isempty(onindices))&&n<10000)
     xksens=[];
     Pksens=cell(1,lon);
     muijsens=[];
-    %plot(stato(1,n),stato(2,n),'ro')
+    plot(stato(1,n),stato(2,n),'ro')
     n=n+1;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%% Plot Zone %%%%%%%%%%%%%%%%%%
 
-% hold off
+ hold off
 % hold off
 xgrid=-range*nq/2:range:range*nq/2;
 ygrid=xgrid;
@@ -466,12 +466,12 @@ curve2= animatedline;
 
 curve3= animatedline('Color','b'); 
 curve4= animatedline('Color','g'); 
-
-for i=1:n-size(ellx,1)
-ellx(:,size(ellx,1)+i)=zeros(size(ellx,1),1)
-elly(:,size(elly,1)+i)=zeros(size(elly,1),1)
+dd=size(ellx,2);
+for i=1:(n-dd)+10
+ellx(:,dd+i)=zeros(size(ellx,1),1);
+elly(:,dd+i)=zeros(size(elly,1),1);
 end
-figure(1) 
+figure(2) 
 hold on 
  for i=1:nq+1 
      plot(xgrid,ones(1,nq+1).*ygrid(i),'*r') 
