@@ -90,7 +90,7 @@ switch caso
     for i=2:ns
         Transmat(i,2:end)=[v2(end+3-i:end),v2(1:end+2-i)];
     end
-    sum(Transmat,1);
+    
     %initial 2D position, velocity and acceleration
     x0=zeros(nx,1);
     x0([1,2,4,6])=0.5;
@@ -465,11 +465,11 @@ curve1 = animatedline('Color','r');
 curve2= animatedline; 
 
 curve3= animatedline('Color','b'); 
-curve4= animatedline('Color','g'); 
-
+curve3= animatedline('Color','g'); 
 for i=1:n-size(ellx,1)
-ellx(:,size(ellx,1)+i)=zeros(size(ellx,1),1)
-elly(:,size(elly,1)+i)=zeros(size(elly,1),1)
+ellx(:,size(ellx,1)+i)=zeros(size(ellx,1))
+elly(:,size(ellx,1)+i)=zeros(size(ellx,1))
+
 end
 figure(1) 
 hold on 
@@ -481,8 +481,10 @@ for i=1:n
      drawnow 
     addpoints(curve2,statocons(1,i),statocons(2,i)) 
     drawnow 
+    if n < size(ellx,1)
     addpoints(curve3,ellx(:,i),elly(:,i))
     drawnow
+    end
 end 
 hold off 
 % plot utilizzando maggiore degli outskirt e il minore 
