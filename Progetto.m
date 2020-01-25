@@ -244,7 +244,7 @@ Pksens=cell(1,lon);
 
 
 while (~(isempty(onindices))&&n<10000)
-    x=move(ABG,stato(:,n),acc,mode(n),Q);   
+    x=move(ABG,stato(:,n),acc,mode(n),Q,caso);   
     mode(n+1)=markchange(s,Transmat);
     stato(:,n+1)=x;
     %check of all idle sensors if any of them is now in range

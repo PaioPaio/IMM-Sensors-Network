@@ -1,4 +1,4 @@
-function [outputArg1,outputArg2] = plotellipse(cov,stato,n,onoff)
+function [outputArg1,outputArg2] = plotellipse(cov,stato,onoff)
 %PLOTELLIPSE Plot an uncertainty ellipses using the covariace matrix
 %   Detailed explanation goes here
 [eigenvec, eigenval ] = eig(cov);
@@ -35,8 +35,8 @@ end
 %chisquare_val = 2.4477;
 theta_grid = linspace(0,2*pi);
 phi = angle;
-X0=stato(1,n);
-Y0=stato(2,n);
+X0=stato(1);
+Y0=stato(2);
 a=sqrt(largest_eigenval); %chisquare_val*
 b=sqrt(smallest_eigenval); %chisquare_val*
 

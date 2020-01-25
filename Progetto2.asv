@@ -12,7 +12,7 @@ delta=0.4;
 %at which rate do we do the consensus ?
 rate=2;
 
-nstop=3000;
+nstop=300;
 
 %Cell matrix of various B for the input
 switch caso
@@ -108,7 +108,7 @@ switch caso
         %Power spectra density of process noise
         Q=diag([0.2,0.2]);
         %magnitude of acceleration
-        acc=[2;1].*0.1;
+        acc=[1;1].*0.01;
         P0=diag([0.1,0.1,0.5,0.5]);
 end
 %state of markov chain
@@ -231,6 +231,15 @@ end
 idlerange=[mini,maxi;minj,maxj];
 %we will check only here if some sensor is now in range
 
+% outskirt=idlerange+[-1 1;-1 1];
+% for i=outskirt(1,1):outskirt(1,2)
+%     for j=outskirt(2,1):outskirt(2,2)
+%         sensors{i,j}.activevertex=onindices;
+%     end
+% end
+%we will give these sensors the indices of the active ones, so that they
+%can check if those are in their neighborhood and turn on
+
 lon=length(onindices);
 
 xsens=[];
@@ -305,6 +314,28 @@ while (~(isempty(onindices))&&n<nstop)
     
     
     idlerange=[mini,maxi;minj,maxj];
+    
+%     update outskirt
+%     if mini-1<1
+%         outskirt(1,1)=mini;
+%     else
+%         outskirt(1,1)=mini-1;
+%     end
+%     if maxi+1>nq
+%         outskirt(1,2)=maxi;
+%     else
+%         outskirt(1,2)=maxi+1;
+%     end
+%     if minj-1<1
+%         outskirt(2,1)=minj;
+%     else
+%         outskirt(2,1)=minj-1;
+%     end
+%     if maxj+1>nq
+%         outskirt(2,2)=maxj;
+%     else
+%         outskirt(2,2)=maxj+1;
+%     end
     %give updated onsensors list
     for i=idlerange(1,1):idlerange(1,2)
         for j=idlerange(2,1):idlerange(2,2)
@@ -428,8 +459,8 @@ for i=0:n-1
     if rem(i,rate)==0
         addpoints(curve2,statocons(1,ni),statocons(2,ni))
         drawnow
-%         addpoints(curve3,ellx(:,ni),elly(:,ni))
-%         drawnow
+        addpoints(curve3,ellx(:,ni),elly(:,ni))
+        drawnow
         ni=ni+1;
     end
 end

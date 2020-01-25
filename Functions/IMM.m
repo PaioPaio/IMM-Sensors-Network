@@ -1,10 +1,10 @@
-function [xkk,Pkk,xpred,Ppred,muk1,muij] = IMM(xprev,Pprev,offset,z,Mat,Trans,Q,R,muk,u,caso)
+function [xkk,Pkk,xpred,Ppred,muk1,muij] = IMM(xprev,Pprev,offset,z,Mat,Trans,Q,R,muk,u,caso,delta)
 %xprev->previous iteration estimates, so if we have 5models it will be 5
 %column vectors
 %Pprev->same thing with covariance
 %offset->position of sensor from where you measured
 %z->measurement
-%Mat->all the models matices (A,B)
+%Mat-> case 1: all the models matices (A,B,)/ case 2: radius of the wheel
 %Trans->Transition matrix for markovchain
 %Q,R->Respectively model noise covariance/spectral density and measurement noise
 %covariance
@@ -46,12 +46,17 @@ L=zeros(1,alto);
 dz=zeros(lungo,alto);
 
 for i=1:alto
-    [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat(i,:),xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso,offset);
+    if caso==1
+        [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat(i,:),xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso,offset,delta,i);
+    else
+        [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat,xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso,offset,delta,i);
+    end
     %% to avoid error => threshold 
-    if S(:,:,i)< 0.001
-       S(:,:,i)=0.001;
-    end    
-    L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
+%     if det(S(:,:,i))< 1e-4
+%        L(i)=0.01;
+%     else   
+       L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
+%     end
     
 end
 

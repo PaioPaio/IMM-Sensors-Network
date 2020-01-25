@@ -8,8 +8,8 @@ function [xk1,Pk1,dz,S] = kalman(Mat,x,u,z,Pk,Q,R,caso,offset,delta,s)
             Ppri=Mat{1}*Pk*Mat{1}'+Mat{3}*Q*Mat{3}';
         case 2
             %non linear
-            [G,F]=Fk(x,u,delta,s,Mat);
-            xpri=fx(x,u,delta,s,Mat);
+            [G,F]=Fk(x,u,delta,s);
+            xpri=fx(x,u,delta,s);
             Ppri=F*Pk*F'+G*Q*G';
     end
     %jacobian
