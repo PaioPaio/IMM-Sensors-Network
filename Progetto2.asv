@@ -380,7 +380,6 @@ while (~(isempty(onindices))&&n<nstop)
             sensors{kk,ll}.mu=sensors{kk,ll}.mu';
 
             Pos_sens_on{n,i}=sensors{kk,ll}.position;
-            Pos_sens_grid{n,i}=sensors{kk,ll}.ingrid;
         end
     end
     
@@ -450,21 +449,14 @@ for i=0:n-2
 %     
 for u=1:size(Pos_sens_on,2)
     if size(Pos_sens_on{i+1,u}) == [0,0];
-    Pos_sens_on{i+1,u} = [0,0];
-    Pos_sens_grid{i+1,u} =[10,10];
-        
-
     else
-        if i>2
-%         temp1=Pos_sens_on{i,u}(1);
-%         temp2=Pos_sens_on{i,u}(2);
-            if sensors{Pos_sens_grid{i,u}(1),Pos_sens_grid{i,u}(2)}.inRange(stato(1:2,i)).inrange==0
-                plot(Pos_sens_on{i,u}(1),Pos_sens_on{i,u}(2),'*r'); %,u}(1),Pos_sens_on{i+1,u}(2)
-            end
-        end   
     plot(Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2),'*g'); %,u}(1),Pos_sens_on{i+1,u}(2)
-       
-    end 
+        if 
+            for
+                
+            end
+            end
+        end
 end
 
 %     
