@@ -6,13 +6,13 @@ clc; clear all; close all;
 %1-> markov chain constant speed or costant acceleration
 %2-> unicycle
 
-caso=2;
+caso=1;
 %delta time
-delta=0.4;
+delta=0.05;
 %at which rate do we do the consensus ?
-rate=2;
+rate=5;
 
-nstop=3000;
+nstop=1500;
 
 %Cell matrix of various B for the input
 switch caso
@@ -112,13 +112,13 @@ switch caso
         P0=diag([0.1,0.1,0.5,0.5]);
 end
 %state of markov chain
-s=randi([1,ns]);
-howconfident=0.9;
-% s=1;
+% s=randi([1,ns]);
+howconfident=0.95;
+s=1;
 
 %Senosors
 range=10;
-R=diag([0.01/3,(2*pi/360)^2]);               %sensor covariance
+R=diag([0.01,(2*pi/360)^2]);               %sensor covariance
 % sensoreprova=Sensor([0,0],range,R);
 
 %real state and mode
@@ -257,7 +257,6 @@ while (~(isempty(onindices))&&n<nstop)
     x=move(stato(:,n),acc,mode(n),Q,caso,delta,ABG);
     mode(n+1)=markchange(s,Transmat);
     stato(:,n+1)=x;
-    phi=x(3);
     %check of all idle sensors if any of them is now in range
     
     for i=idlerange(1,1):idlerange(1,2)
@@ -428,8 +427,8 @@ for i=0:n-1
     if rem(i,rate)==0
         addpoints(curve2,statocons(1,ni),statocons(2,ni))
         drawnow
-%         addpoints(curve3,ellx(:,ni),elly(:,ni))
-%         drawnow
+        addpoints(curve3,ellx(:,ni),elly(:,ni))
+        drawnow
         ni=ni+1;
     end
 end

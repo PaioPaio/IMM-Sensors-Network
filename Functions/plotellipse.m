@@ -37,8 +37,8 @@ theta_grid = linspace(0,2*pi);
 phi = angle;
 X0=stato(1);
 Y0=stato(2);
-a=sqrt(largest_eigenval); %chisquare_val*
-b=sqrt(smallest_eigenval); %chisquare_val*
+a=sqrt(3*largest_eigenval); %chisquare_val*
+b=sqrt(3*smallest_eigenval); %chisquare_val*
 
 % the ellipse in x and y coordinates 
 ellipse_x_r  = a*cos( theta_grid );
