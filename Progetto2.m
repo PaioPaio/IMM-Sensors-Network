@@ -448,38 +448,34 @@ for i=0:n-2
 % %     plot(xgrid,ones(1,nq+1).*ygrid(q),'*r')
 % %     end
 %     
-for u=1:size(Pos_sens_on,2)
-    if size(Pos_sens_on{i+1,u}) == [0,0];
-    Pos_sens_on{i+1,u} = [0,0];
-    Pos_sens_grid{i+1,u} =[10,10];
+    for u=1:size(Pos_sens_on,2)
+        if size(Pos_sens_on{i+1,u}) == [0,0];
+        Pos_sens_on{i+1,u} = [0,0];
+        Pos_sens_grid{i+1,u} =[1,1];
         
 
     else
-        if i>2
+        if i>15
 %         temp1=Pos_sens_on{i,u}(1);
 %         temp2=Pos_sens_on{i,u}(2);
-            if sensors{Pos_sens_grid{i,u}(1),Pos_sens_grid{i,u}(2)}.inRange(stato(1:2,i)).inrange==0
-                plot(Pos_sens_on{i,u}(1),Pos_sens_on{i,u}(2),'*r'); %,u}(1),Pos_sens_on{i+1,u}(2)
+            if sensors{Pos_sens_grid{i-14,u}(1),Pos_sens_grid{i-14,u}(2)}.inrange==false
+                plot(Pos_sens_on{i-14,u}(1),Pos_sens_on{i-14,u}(2),'*b'); %,u}(1),Pos_sens_on{i+1,u}(2)
             end
         end   
     plot(Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2),'*g'); %,u}(1),Pos_sens_on{i+1,u}(2)
        
-    end 
-end
-
-%     
-%     end  
-%     end
-    
+        end 
+    end
     if rem(i,rate)==0
         addpoints(curve2,statocons(1,ni),statocons(2,ni))
         drawnow
-%         addpoints(curve3,ellx(:,ni),elly(:,ni))
-%         drawnow
-%           plot([ellx(i,ni),ellx(i+1,ni)],[elly(i,ni),elly(i+1,ni)])
+        addpoints(curve3,ellx(:,ni),elly(:,ni))
+        drawnow
+        %plot([ellx(i,ni),ellx(i+1,ni)],[elly(i,ni),elly(i+1,ni)])
         ni=ni+1;
     end
 end
+
 for i=0:n-2
 for u=1:size(Pos_sens_on,2)
     if size(Pos_sens_on{i+1,u}) == [0,0];
