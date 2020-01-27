@@ -8,9 +8,10 @@ clc; clear all; close all;
 
 caso=2;
 %delta time
-delta=0.5;
+delta=0.4;
 %at which rate do we do the consensus ?
-rate=5;
+rate=3;
+
 
 nstop=1500;
 
@@ -262,7 +263,6 @@ ygrid=xgrid;
 %     plot(xgrid,ones(1,nq+1).*ygrid(i),'*r')
 % end
 
-
 while (~(isempty(onindices))&&n<nstop)
     x=move(stato(:,n),acc,mode(n),Q,caso,delta,ABG);
     mode(n+1)=markchange(s,Transmat);
@@ -363,6 +363,8 @@ while (~(isempty(onindices))&&n<nstop)
             sensors{kk,ll}.xcons=statocons(:,ncons+1);
             sensors{kk,ll}.Pcons=Pcons(:,:,ncons+1);
             sensors{kk,ll}.mu=mucons(:,ncons+1);
+            %pick xcons of all on sensors
+            %
         end
         
         for i=1:ns
@@ -387,13 +389,11 @@ while (~(isempty(onindices))&&n<nstop)
             sensors{kk,ll}.xconskalm=sensors{kk,ll}.xpred;
             sensors{kk,ll}.Pconskalm=sensors{kk,ll}.Ppred;
             sensors{kk,ll}.mu=sensors{kk,ll}.mu';
-
-            Pos_sens_on{n,i}=sensors{kk,ll}.position;
-            Pos_sens_grid{n,i}=sensors{kk,ll}.ingrid;
-           
+            % %pick xcons of all on sensors
+            %
         end
     end
-     Idle_range_n{n}=idlerange;
+    
     if rem(n+1,rate)==0
         [ell_x,ell_y] =plotellipse(Pcons(1:2,1:2,ncons),statocons(1:2,ncons),0);
         ellx(:,ncons)=ell_x(:);
@@ -403,6 +403,7 @@ while (~(isempty(onindices))&&n<nstop)
     for q=1:size(onindices,2)
         saveon{n,q}=onindices{q};
     end
+    
     
     xsens=[];
     Psens=[];
@@ -530,12 +531,11 @@ for i=0:n-3
 %         end
 %     end
 %     fourth
-for lt1=1:size(sensors,1)
-    for lt2=1:size(sensors,2)
-        if sensors.
-        sensors{lt1,lt2}.plotsensor;
-    end
-end
+% for lt1=1:size(sensors,1)
+%     for lt2=1:size(sensors,2)
+%         sensors{lt1,lt2}.plotsensor;
+%     end
+% end
 
     if rem(i,rate)==0
         addpoints(curve2,statocons(1,ni),statocons(2,ni))
@@ -549,14 +549,14 @@ end
     end
 end
 
-for i=0:n-3
-for u=1:size(Pos_sens_on,2)
-    if size(Pos_sens_on{i+1,u}) == [0,0];
-    else
-    plot(Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2),'*g'); %,u}(1),Pos_sens_on{i+1,u}(2)
-    end
-end
-end
+% for i=0:n-3
+% for u=1:size(Pos_sens_on,2)
+%     if size(Pos_sens_on{i+1,u}) == [0,0];
+%     else
+%     plot(Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2),'*g'); %,u}(1),Pos_sens_on{i+1,u}(2)
+%     end
+% end
+% end
 hold off
 % plot utilizzando maggiore degli outskirt e il minore
 figure(3)

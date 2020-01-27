@@ -55,8 +55,8 @@ for i=1:alto
 %     if det(S(:,:,i))< 1e-3
 %        L(i)=0.01;
 %     else   
-    if  any(eig(S(:,:,i))<0.1)
-        L(i)=0.01;
+    if  any(eig(S(:,:,i))<0.01)
+        L(i)=0.001;
     else
         L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
     end

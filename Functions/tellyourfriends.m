@@ -10,6 +10,7 @@ if message=="Can"
     n=length(amici);
     for k=1:n
         gigi=amici{k};
+        grid{gigi(1),gigi(2)}.activevertex=sensor.activevertex;
         grid{gigi(1),gigi(2)}.change=1;
         grid{gigi(1),gigi(2)}.checkchange;
     end
@@ -18,6 +19,7 @@ elseif message=="Cannot"
     n=length(amici);
     for k=1:n
         gigi=amici{k};
+        grid{gigi(1),gigi(2)}.activevertex=sensor.activevertex;
         grid{gigi(1),gigi(2)}.change=-1;
         grid{gigi(1),gigi(2)}.checkchange;
     end
