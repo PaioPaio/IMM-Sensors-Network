@@ -52,11 +52,11 @@ for i=1:alto
         [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat,xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso,offset,delta,i);
     end
     %% to avoid error => threshold 
-%     if det(S(:,:,i))< 1e-4
-%        L(i)=0.01;
-%     else   
+    if det(S(:,:,i))< 1e-3
+       L(i)=0.01;
+    else   
        L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
-%     end
+    end
     
 end
 
