@@ -81,24 +81,33 @@ switch caso
         nx=4;
         
         %Transition Matrix of markov chain
-        p1=0.7;     %probability of constant speed while being in constant speed
-        q1=0.4;     %probability of still accelerating forward while accelerating forward
+        p1=0.8;     %probability of constant speed while being in constant speed
+        q1=0.5;     %probability of still accelerating forward while accelerating forward
         backcost=0.2;
         p=(1-p1)/4;
-        q=(1-q1-backcost)/5;
+        %q=(1-q1-backcost)/5;
+        q=q1/2;
         v1=[p1 p p p p];
-        v2=[q1 2*q q 2*q];
-        
+%         v2=[q1 2*q q 2*q];
+%         
         ns=length(v1);
-        
-        %the matrix is "circulant" from so we can build it
-        %algorithmically
+%         
+%         %the matrix is "circulant" from so we can build it
+%         %algorithmically
+%         Transmat=zeros(ns);
+%         Transmat(1,:)=v1;
+%         Transmat(2:end,1)=ones(4,1).*backcost;
+%         for i=2:ns
+%             Transmat(i,2:end)=[v2(end+3-i:end),v2(1:end+2-i)];
+%         end
+
+        % Hardcoded
         Transmat=zeros(ns);
         Transmat(1,:)=v1;
-        Transmat(2:end,1)=ones(4,1).*backcost;
-        for i=2:ns
-            Transmat(i,2:end)=[v2(end+3-i:end),v2(1:end+2-i)];
-        end
+        Transmat(2,:)=[q q1 q 0 0]; 
+        Transmat(3,:)=[q q q1 0 0]; 
+        Transmat(4,:)=[q 0 0 q1 q]; 
+        Transmat(5,:)=[q 0 0 q q1];
         %initial 2D position, velocity and acceleration
         x0=zeros(nx,1);
         x0([1,2])=0.5;
@@ -381,9 +390,10 @@ while (~(isempty(onindices))&&n<nstop)
 
             Pos_sens_on{n,i}=sensors{kk,ll}.position;
             Pos_sens_grid{n,i}=sensors{kk,ll}.ingrid;
+           
         end
     end
-    
+     Idle_range_n{n}=idlerange;
     if rem(n+1,rate)==0
         [ell_x,ell_y] =plotellipse(Pcons(1:2,1:2,ncons),statocons(1:2,ncons),0);
         ellx(:,ncons)=ell_x(:);
@@ -440,43 +450,106 @@ hold on
 for i=1:nq+1
     plot(xgrid,ones(1,nq+1).*ygrid(i),'*r')
 end
-for i=0:n-2
+for i=0:n-3
     addpoints(curve1,stato(1,i+1),stato(2,i+1))
     drawnow
-    
-% %     for q=1:nq+1
-% %     plot(xgrid,ones(1,nq+1).*ygrid(q),'*r')
-% %     end
-%     
-    for u=1:size(Pos_sens_on,2)
-        if size(Pos_sens_on{i+1,u}) == [0,0];
-        Pos_sens_on{i+1,u} = [0,0];
-        Pos_sens_grid{i+1,u} =[1,1];
+%     for u=1:size(Pos_sens_on,2)
+%         if size(Pos_sens_on{i+1,u}) == [0,0];
+%         Pos_sens_on{i+1,u} = [0,0];
+%         Pos_sens_grid{i+1,u} =[1,1];
+% for u=1:size(Pos_sens_on,2)  
+% if size(Pos_sens_on{i+1,u}) == [0,0];
+%                 Pos_sens_on{i+1,u} = [0,0];
+%                 Pos_sens_grid{i+1,u}=[10,10];
+%                 Idle_range_n{i+1}=[9,12;9,12];
+% end
+%   end
+%  if i>2    
+%     for u=1:size(Pos_sens_on,2)
+%         if size(Pos_sens_on{i+1,u}) == [0,0];
+%                 Pos_sens_on{i+1,u} = Pos_sens_on{i,u};
+%                 Pos_sens_grid{i+1,u} =Pos_sens_grid{i+1,u};
+%                 Idle_range_n{i+1}=Idle_range_n{i};
+%                 
+%         else
+%           First implementation
+%             if i>16
+%             if sensors{Pos_sens_grid{i-14,u}(1),Pos_sens_grid{i-14,u}(2)}.inrange==false 
+%                 plot(Pos_sens_on{i-14,u}(1),Pos_sens_on{i-14,u}(2),'*b'); %,u}(1),Pos_sens_on{i+1,u}(2)
+%             end
+%         end 
+%         if i>7
+%             if sensors{Pos_sens_grid{i-6,u}(1),Pos_sens_grid{i-6,u}(2)}.inrange==false &&  sensors{Pos_sens_grid{i-6,u}(1),Pos_sens_grid{i-6,u}(2)}.state=="idle"
+%                 plot(Pos_sens_on{i-6,u}(1),Pos_sens_on{i-6,u}(2),'*y'); %,u}(1),Pos_sens_on{i+1,u}(2)
+%             end
+%             if i>10
+%             if sensors{Pos_sens_grid{i-9,u}(1),Pos_sens_grid{i-9,u}(2)}.inrange==false && sensors{Pos_sens_grid{i-9,u}(1),Pos_sens_grid{i-9,u}(2)}.state~="off"
+%                 plot(Pos_sens_on{i-9,u}(1),Pos_sens_on{i-9,u}(2),'*b'); %,u}(1),Pos_sens_on{i+1,u}(2)
+%            end  
+%             if sensors{Pos_sens_grid{i-9,u}(1),Pos_sens_grid{i-9,u}(2)}.state=="idle"
+%                 plot(Pos_sens_on{i-9,u}(1),Pos_sens_on{i-9,u}(2),'*y');
+%         end
+%          end % questo end se scommenti è in più
+% %             if sensors{Pos_sens_grid{i-9,u}(1),Pos_sens_grid{i-9,u}(2)}.state=="idle"
+% %                 plot(Pos_sens_on{i-9,u}(1),Pos_sens_on{i-9,u}(2),'*y'); %,u}(1),Pos_sens_on{i+1,u}(2)
+% %             end  
+% %         end
+%         if i>2
+%            if sensors{Pos_sens_grid{i,u}(1),Pos_sens_grid{i,u}(2)}.inrange==false % && sensors{Pos_sens_grid{i,u}(1),Pos_sens_grid{i,u}(2)}.state~="idle"
+%                 plot(Pos_sens_on{i,u}(1),Pos_sens_on{i,u}(2),'*b'); %,u}(1),Pos_sens_on{i+1,u}(2)
+%            end
+%            if  sensors{Pos_sens_grid{i,u}(1),Pos_sens_grid{i,u}(2)}.inrange==false && sensors{Pos_sens_grid{i,u}(1),Pos_sens_grid{i,u}(2)}.state=="idle"
+%                 plot(Pos_sens_on{i,u}(1),Pos_sens_on{i,u}(2),'*y');
+%            end
+%            
+%   % second implementation
+%         if Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2)==Pos_sens_on{i,u}(1),Pos_sens_on{i,u}(2)
+%             plot(Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2),'*g'); %,u}(1),Pos_sens_on{i+1,u}(2)
+%         elseif  Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2)~=Pos_sens_on{i,u}(1),Pos_sens_on{i,u}(2)&& sensors{Pos_sens_grid{i,u}(1),Pos_sens_grid{i,u}(2)}.state=='idle';  
+%             plot(Pos_sens_on{i,u}(1),Pos_sens_on{i,u}(2),'*y');
+%             plot(Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2),'*g');
+%         elseif sensors{Pos_sens_grid{i,u}(1),Pos_sens_grid{i,u}(2)}.state~='idle' && sensors{Pos_sens_grid{i,u}(1),Pos_sens_grid{i,u}(2)}.inrange==false
+%             plot(Pos_sens_on{i,u}(1),Pos_sens_on{i,u}(2),'*b');
+%             plot(Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2),'*g');
+%         end
+% third and maybe last for today
         
-
-    else
-        if i>15
-%         temp1=Pos_sens_on{i,u}(1);
-%         temp2=Pos_sens_on{i,u}(2);
-            if sensors{Pos_sens_grid{i-14,u}(1),Pos_sens_grid{i-14,u}(2)}.inrange==false
-                plot(Pos_sens_on{i-14,u}(1),Pos_sens_on{i-14,u}(2),'*b'); %,u}(1),Pos_sens_on{i+1,u}(2)
-            end
-        end   
-    plot(Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2),'*g'); %,u}(1),Pos_sens_on{i+1,u}(2)
+        
+   % plot(Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2),'*g'); %,u}(1),Pos_sens_on{i+1,u}(2)
        
-        end 
-    end
-    if rem(i,rate)==0
-        addpoints(curve2,statocons(1,ni),statocons(2,ni))
-        drawnow
-        addpoints(curve3,ellx(:,ni),elly(:,ni))
-        drawnow
-        %plot([ellx(i,ni),ellx(i+1,ni)],[elly(i,ni),elly(i+1,ni)])
-        ni=ni+1;
+% %         end 
+%         end
+%     end
+%     for idl1=Idle_range_n{i}(1,1):Idle_range_n{i}(2,1)
+%         for idl2=Idle_range_n{i}(1,2):Idle_range_n{i}(2,2);
+%             if Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2)==sensors{idl1,idl2}.position;
+%                 plot(Pos_sens_on{i+1,u}(1),Pos_sens_on{i+1,u}(2),'*y');
+%             else
+%             plot(sensors{idl1,idl2}.position(1),sensors{idl1,idl2}.position(2),'*g')
+%             end
+%         end
+%     end
+%     fourth
+for lt1=1:size(sensors,1)
+    for lt2=1:size(sensors,2)
+        if sensors.
+        sensors{lt1,lt2}.plotsensor;
     end
 end
 
-for i=0:n-2
+    if rem(i,rate)==0
+        addpoints(curve2,statocons(1,ni),statocons(2,ni))
+        drawnow
+%         addpoints(curve3,ellx(:,ni),elly(:,ni)) % tolgo solo per avere
+%         plot più veloce
+%         drawnow
+%         %plot([ellx(i,ni),ellx(i+1,ni)],[elly(i,ni),elly(i+1,ni)])
+        ni=ni+1;
+        
+    end
+end
+
+for i=0:n-3
 for u=1:size(Pos_sens_on,2)
     if size(Pos_sens_on{i+1,u}) == [0,0];
     else

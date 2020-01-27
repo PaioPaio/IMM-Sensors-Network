@@ -13,7 +13,8 @@ classdef Sensor<handle
        neighboors {}            %cell array with indices of listeners/sources
        activevertex{}           %active graph indices
        
-       change {}                
+       change {} 
+       color {}                 % for plot
        %token that should be -1 if a neighboor has gone from ON to IDLE,
        % 1 if it has gone from IDLE to ON, 0 in any other case
        
@@ -73,7 +74,15 @@ classdef Sensor<handle
                 obj.sensed=[sqrt(vector*vector');actualangle]+randn(2,1).*arrayfun(@(a)sqrt(a),diag(obj.R));
             end
         end
-        
+        function obj=plotsensor(obj)
+            if obj.state=="on"
+                plot(obj.position(1),obj.position(2),'*g');
+            elseif obj.state=="idle"
+                plot(obj.position(1),obj.position(2),'*y');
+            elseif obj.state=="off"
+                plot(obj.position(1),obj.position(2),'*r');
+            end
+        end
         function obj=checkchange(obj)
             %checks events nearby
             if obj.change==1
