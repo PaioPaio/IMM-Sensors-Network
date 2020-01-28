@@ -52,7 +52,7 @@ r_ellipse = [ellipse_x_r;ellipse_y_r]' * R;
 
 % Draw the error ellipse
 if onoff ==1
-%plot(r_ellipse(:,1) + X0,r_ellipse(:,2) + Y0,'-')
+    plot(r_ellipse(:,1) + X0,r_ellipse(:,2) + Y0,'-')
 end
 outputArg1 = r_ellipse(:,1) + X0;
 outputArg2 = r_ellipse(:,2) + Y0;

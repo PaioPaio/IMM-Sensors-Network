@@ -54,8 +54,11 @@ for i=1:alto
     %% to avoid error => threshold 
 %     if det(S(:,:,i))< 1e-3
 %        L(i)=0.01;
-%     else   
-    if  any(eig(S(:,:,i))<0.01)
+%     else
+if min(eig(S(:,:,i))) < 1e-9
+        aaa = 10;
+    end
+    if  any(eig(S(:,:,i))<(2*pi/360)^2/2) % Smallest of diag(R)
         L(i)=0.001;
     else
         L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
