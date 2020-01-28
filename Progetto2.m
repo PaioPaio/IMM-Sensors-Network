@@ -283,13 +283,11 @@ while (~(isempty(onindices))&&n<nstop)
                 %add to onindices if it's in range and not already in the
                 %list
                 if ~any(check,'all')
-                    
                     sensors{i,j}.activevertex=onindices;
                     sensors{i,j}.initializefromidle(sensors);
                     %the sensors doesn't have anything to compute the IMM,
                     %we initialize them getting everything from their
                     %neighboors that are on
-                    
                     onindices{end+1}=[i,j];
                     sensors{i,j}.activevertex=onindices;
                     %send your neighboors a message that you are now on
@@ -321,8 +319,8 @@ while (~(isempty(onindices))&&n<nstop)
     
     idlerange=[mini,maxi;minj,maxj];
     %give updated onsensors list
-    for i=idlerange(1,1):idlerange(1,2)
-        for j=idlerange(2,1):idlerange(2,2)
+    for i=(idlerange(1,1)-1):(idlerange(1,2)+1)
+        for j=(idlerange(2,1)-1):(idlerange(2,2)+1)
             sensors{i,j}.activevertex=onindices;
         end
     end
@@ -374,7 +372,7 @@ while (~(isempty(onindices))&&n<nstop)
     %Here we have a dynamic (vertexes can go in and out) fully connected
     %graph
     
-    if rem(n,rate)==0 % qui c'era un n+1 perchè ?
+    if rem(n,rate)==0 % qui c'era un n+1 perchï¿½ ?
         [statocons(:,ncons+1),Pcons(:,:,ncons+1)]=WLS(xsens,Psens,Hsens);
         [mucons(:,ncons+1),muijcons(:,:,ncons+1)]=WLS(musens,muijsens,Hmu);
         %check when do we have to do consensus
@@ -424,7 +422,6 @@ while (~(isempty(onindices))&&n<nstop)
     end
     
    
-    
     
     
     xsens=[];
