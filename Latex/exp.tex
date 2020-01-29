@@ -64,10 +64,16 @@ a sensor grid tracking an object. The object can move with two different model, 
             The tracking are performed with grid of sensors. In order to perform a proper simulation the sensor has assumed to have a limited
             range for the tracking and we cannot retrive any information if target is out. It also took in consideration the power consumption 
             for a possible physical system: to model a more enegy efficient system the sensor can switch to 3 different working condition: On,Off,Idle.
-            To achive this goal the sensor is working as a state machine as showned in the figure below:
-            
+            To achive this goal the sensor is working as a state machine as showned in the figure below: \begin{figure}[htp]
+                \centering
+                \includegraphics[scale=0.1]{UntitledDiagram.png}
+                \caption{An image of a galaxy}
+                \label{fig:galaxy}
+                \end{figure}
             Sensors can communicate with the sensors in their neighboorhoods and exchange signal named CanSense and CantSense that regulate the transition
-            between differents state. 
+            between differents state. Thus implies that not all the sensors receive all the messagge, but only from their Neighboors. The sensors in On state
+            create a fully connected graph. The nodes composing the graph changes dynamically with iterations according with the movements of target. The numbers of
+            sensors turned on depends on working range choosed and position of target.
 
             {How the sensors works}
 
@@ -86,46 +92,44 @@ a sensor grid tracking an object. The object can move with two different model, 
     The single sensor works as a state machine, and change its state accordingly with the signal exchanged with the neighboors.
     \begin{figure}[htp]
         \centering
-        \includegraphics[width=2cm, height=2cm]{UntitledDiagram.png}
+        \includegraphics[scale=0.1]{UntitledDiagram.png}
         \caption{An image of a galaxy}
         \label{fig:galaxy}
     \end{figure}
     \subsection*{Random walk and Unycicle model}
     The target in this simulation can move accordingly to two model: random walk and Unycicle. The genaral expression of the two process it
     \begin{equation}
-    X^{+}=\begin{bmatrix} A \\ \end{bmatrix}X(k)+\begin{bmatrix} B \\ \end{bmatrix}u(k) + \begin{bmatrix} G \\ \end{bmatrix}w(k)
+    X^{+}= \textbf{A}X(k) + \textbf{B}u(k) + \textbf{G}w(k)
     \end{equation}
     State,state and noise matrix associate to the random walk has showned below:
-    $$
-    X=\begin{bmatrix} x \\ y \\ \dot{x} \\ \dot{y} \\ \end{bmatrix}
-    $$
-
-    $$
-    A=\begin{bmatrix}
-    1&0&\delta&0\\
-    0&1&0&\delta\\
-    0&0&1&0\\
-    0&0&0&1\\
-    \end{bmatrix}
-    $$
-
-    $$
-    G=\begin{bmatrix}
-    \delta^2/2&0\\
-    0&delta^2/2\\
-    \delta&0\\
-    0&\delta\\
-    \end{bmatrix}
-    $$
-
-    $$
-    B= \begin{bmatrix}
-        \delta^2/2&0\\
-        0&delta^2/2\\
-        \delta&0\\
-        0&\delta\\
-    \end{bmatrix}
-    $$
+    \[ X=\begin{bmatrix} x \\ y \\ \dot{x} \\ \dot{y} \\ \end{bmatrix}  A=\begin{bmatrix}
+        1&0&\delta&0\\
+        0&1&0&\delta\\
+        0&0&1&0\\
+        0&0&0&1\\
+        \end{bmatrix}
+        G=\begin{bmatrix}
+            \delta^2/2&0\\
+            0&\delta^2/2\\
+            \delta&0\\
+            0&\delta\\
+            \end{bmatrix}
+        \]
+        The \textbf{B} input matrix change accordingly with the acceleration input
+    \[
+        B=\begin{bmatrix}
+            \delta^2/2 & 0\\
+            0 & 0  \\
+            \delta & 0 \\
+            0 & 0 \\
+            \end{bmatrix}
+            B=\begin{bmatrix}
+                0 & 0 \\
+             0 & \delta^2/2 \\
+            0 & 0 \\
+            0 & \delta \\
+            \end{bmatrix}
+  \]
    The unycicle model state representation employed has showned below
 
     
