@@ -52,13 +52,7 @@ for i=1:alto
         [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat,xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso,offset,delta,i);
     end
     %% to avoid error => threshold 
-%     if det(S(:,:,i))< 1e-3
-%        L(i)=0.01;
-%     else
-if min(eig(S(:,:,i))) < 1e-9
-        aaa = 10;
-    end
-    if  any(eig(S(:,:,i))<(2*pi/360)^2/2) % Smallest of diag(R)
+    if  rcond(S(:,:,i)
         L(i)=0.001;
     else
         L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
@@ -76,5 +70,8 @@ xkk=xpred*muk1';
 Pkk=zeros(largo);
 for i=1:alto
     Pkk=Pkk+(Ppred(:,:,i)+(xkk-xpred(:,i))*(xkk-xpred(:,i))')*muk1(i);
+end
+if rcond(Pkk)<0.0001
+    "OMEGALUL"
 end
 end

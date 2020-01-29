@@ -1,6 +1,5 @@
 function H=Hk(xprior,caso,offset)
-%xprior-> row vector containing the prediction of the state (6 elements
-%[x,y,vx,vy,ax,ay]
+%xprior-> row vector containing the prediction of the state 
 %h(xprior) should be the cartesian transform aka
 %rho=sqrt(x^2+y^2)
 %theta=atan2(y/x)

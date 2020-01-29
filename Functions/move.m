@@ -1,5 +1,5 @@
 %% output: x1-> position + speed; s->next markov state;
-%% input:  x-> position + speed + ; a->acceleration magnitude; s-> state of markov chain, Mat->cell array of all B matrices;
+%% input:  x-> position + speed + ; a->acceleration magnitude; s-> state of markov chain, Mat->cell array of all B matrices/radius id case==2;
 %%         T-> transition Matrix 
 
 function x1=move(x,a,s,Q,caso,delta,Mat)

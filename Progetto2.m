@@ -5,18 +5,17 @@ clc; clear all; close all;
 %1-> markov chain constant speed or costant acceleration
 %2-> unicycle
 
-caso=2;
+caso=1;
 %delta time
-delta=0.5;
+delta=0.01;
 %at which rate do we do the consensus ?
-rate=5;
+rate=1;
 %Maximum number of iteration
 nstop=800;
-%% Plot
-videon = 1;
-ploton =1;
-plotallsenson=1;
-%Cell matrix of various B for the input
+%Plot
+videon = 0;
+ploton =0;
+plotallsenson=0;
 switch caso
     
     case 1
@@ -81,24 +80,20 @@ switch caso
         
         %length of state vector
         nx=4;
+        ns=5;
         
         %Transition Matrix of markov chain
-        p1=0.8;     %probability of constant speed while being in constant speed
-        q1=0.5;     %probability of still accelerating forward while accelerating forward
-        backcost=0.2;
+        p1=0.6;     %probability of constant speed while being in constant speed
+        q1=1/3;     %probability of still accelerating forward while accelerating forward
         p=(1-p1)/4;
-        %q=(1-q1-backcost)/5;
-        q=q1/2;
-        v1=[p1 p p p p];
-%         v2=[q1 2*q q 2*q];
-%         
-        ns=length(v1);
+        q=(1-q1)/2;
+        
         % Hardcoded
         Transmat=zeros(ns);
-        Transmat(1,:)=v1;
-        Transmat(2,:)=[q q1 q 0 0]; 
-        Transmat(3,:)=[q q q1 0 0]; 
-        Transmat(4,:)=[q 0 0 q1 q]; 
+        Transmat(1,:)=[p1 p p p p];
+        Transmat(2,:)=[q q1 q 0 0];
+        Transmat(3,:)=[q q q1 0 0];
+        Transmat(4,:)=[q 0 0 q1 q];
         Transmat(5,:)=[q 0 0 q q1];
         %initial 2D position, velocity and acceleration
         x0=zeros(nx,1);
@@ -107,10 +102,10 @@ switch caso
         %radius, called like this for reasons
         ABG=0.3;
         %Power spectra density of process noise
-        Q=diag([0.2,0.2]);
+        Q=diag([0.1,0.1]);
         %magnitude of acceleration
         acc=[2;1].*0.1;
-        P0=diag([0.1,0.1,0.5,0.5]);
+        P0=diag([1,1,1,1]);
 end
 %state of markov chain
 % s=randi([1,ns]);
@@ -120,10 +115,8 @@ s=1;
 %Senosors
 range=10;
 R=diag([0.01,(2*pi/360)^2]);               %sensor covariance
-% sensoreprova=Sensor([0,0],range,R);
 
 %real state and mode
-% n=1;
 stato=zeros(nx,10); %vector of the real state of the moving object
 mode=zeros(1,10);   %vector of the real mode of the moving object
 stato(:,1)=x0;
@@ -139,8 +132,6 @@ for i=1:ns
         mu1(i)=(1-howconfident)/(ns-1);
     end
 end
-% mu1=[0.9 0.25 0.25 0.25 0.25]';
-% sensoreprova.inRange(stato(1:2,1));
 
 %model probabilities
 mu=zeros(ns,10);
@@ -177,7 +168,7 @@ for i=1:nq
 end
 
 
-statecons=zeros(nx,10);
+statocons=zeros(nx,10);
 Pcons=zeros(nx,nx,10);
 mucons=zeros(ns,10);
 muijcons=zeros(ns,ns,10);
@@ -257,15 +248,15 @@ curvesens2= animatedline('Color','c');
 curvesens3= animatedline('Color','k');
 curvesens4= animatedline('Color','y');
 
-if ploton ==1    
-hold on
-hhh=figure(1)
-%filename = 'testAnimated.gif';
-for i=1:nq % initializate the plot grid
-    for j=1:nq
-        plotS{i,j}=sensors{i,j}.plotsensor;
+if ploton ==1
+    hold on
+    hhh=figure(1)
+    filename = 'testAnimated.gif';
+    for i=1:nq % initializate the plot grid
+        for j=1:nq
+            plotS{i,j}=sensors{i,j}.plotsensor;
+        end
     end
-end
 end
 
 while (~(isempty(onindices))&&n<nstop)
@@ -279,7 +270,7 @@ while (~(isempty(onindices))&&n<nstop)
             sensors{i,j}.inRange(stato(1:2,n+1));
             check=checkvertex(onindices,[i,j]);
             if sensors{i,j}.inrange
- 
+                
                 %add to onindices if it's in range and not already in the
                 %list
                 if ~any(check,'all')
@@ -319,26 +310,25 @@ while (~(isempty(onindices))&&n<nstop)
     
     idlerange=[mini,maxi;minj,maxj];
     %give updated onsensors list
-    for i=(idlerange(1,1)-1):(idlerange(1,2)+1)
-        for j=(idlerange(2,1)-1):(idlerange(2,2)+1)
-            sensors{i,j}.activevertex=onindices;
-        end
-    end
+    %and maybe plot
     
     for i=idlerange(1,1)-1:idlerange(1,2)+1
-        if i>=20
-            i=20;
-        elseif i<=0
+        if i>=nq
+            i=nq;
+        elseif i<=1
             i=1;
         end
-            for j=idlerange(2,1)-1:idlerange(2,2)+1
-                if j>=20
-                    j=20;
-                elseif j<=0
-                    j=1;
-                end
-                    plotS{i,j}=sensors{i,j}.plotsensor;
+        for j=idlerange(2,1)-1:idlerange(2,2)+1
+            if j>=nq
+                j=nq;
+            elseif j<=1
+                j=1;
             end
+            sensors{i,j}.activevertex=onindices;
+            if ploton==1
+                plotS{i,j}=sensors{i,j}.plotsensor;
+            end
+        end
     end
     %compute IMM for all the sensors that are on
     for i=1:lon
@@ -372,12 +362,16 @@ while (~(isempty(onindices))&&n<nstop)
     %Here we have a dynamic (vertexes can go in and out) fully connected
     %graph
     
-    if rem(n,rate)==0 % qui c'era un n+1 perch� ?
+    if rem(n,rate)==0 && n~=1
+        % (n+1) is the current iteration of the movement, so we sense that
+        % and we cant to do consensus on that. We already have initiated
+        % the first consensus at x0 and P0 with at n=1 out of the loop, so
+        % the next consensi should happen at n+1=1+rate*k or rem(n,rate)==0
         [statocons(:,ncons+1),Pcons(:,:,ncons+1)]=WLS(xsens,Psens,Hsens);
         [mucons(:,ncons+1),muijcons(:,:,ncons+1)]=WLS(musens,muijsens,Hmu);
         %check when do we have to do consensus
         if ploton==1
-             addpoints(curve2,statocons(1,n/rate),statocons(2,n/rate)) ; % addpoints(curve2,statocons(1,(n+1)/rate+1),statocons(2,(n+1)/rate+1))
+            addpoints(curve2,statocons(1,ncons+1),statocons(2,ncons+1)) ; % addpoints(curve2,statocons(1,(n+1)/rate+1),statocons(2,(n+1)/rate+1))
             drawnow
         end
         for i=1:lon
@@ -390,7 +384,7 @@ while (~(isempty(onindices))&&n<nstop)
             %
             xconsallsensor{n,i}=sensors{kk,ll}.xcons;
         end
-      
+        
         for i=1:ns
             Pkksens=[];
             for j=1:lon
@@ -405,7 +399,7 @@ while (~(isempty(onindices))&&n<nstop)
         end
         ncons=ncons+1;
     else
-     %addpoints(curve2,statocons(1,n-1),statocons(2,n-1));
+        %addpoints(curve2,statocons(1,n-1),statocons(2,n-1));
         for i=1:lon
             kk=onindices{i}(1);
             ll=onindices{i}(2);
@@ -414,14 +408,14 @@ while (~(isempty(onindices))&&n<nstop)
             sensors{kk,ll}.xconskalm=sensors{kk,ll}.xpred;
             sensors{kk,ll}.Pconskalm=sensors{kk,ll}.Ppred;
             sensors{kk,ll}.mu=sensors{kk,ll}.mu';
-           
+            
             % %pick xcons of all on sensors
             %
             xconsallsensor{n,i}=sensors{kk,ll}.xcons;
         end
     end
     
-   
+    
     
     
     xsens=[];
@@ -436,87 +430,87 @@ while (~(isempty(onindices))&&n<nstop)
     %plot(stato(1,n),stato(2,n),'ro')
     
     if ploton==1
-        if rem(n+1,rate)==0
+        if rem(n-1,rate)==0
             [ell_x,ell_y] =plotellipse(Pcons(1:2,1:2,ncons),statocons(1:2,ncons),ploton);
             ellx(:,ncons)=ell_x(:);
             elly(:,ncons)=ell_y(:);
-       
+            
         end
         
         addpoints(curve1,stato(1,n),stato(2,n))
         drawnow
-       if plotallsenson==1
-        if lon>=1
-            addpoints(curvesens1,xconsallsensor{n,1}(1),xconsallsensor{n,1}(2));
-            drawnow
+        if plotallsenson==1
+            if lon>=1
+                addpoints(curvesens1,xconsallsensor{n,1}(1),xconsallsensor{n,1}(2));
+                drawnow
+            end
+            if lon>=2
+                addpoints(curvesens2,xconsallsensor{n,2}(1),xconsallsensor{n,2}(2));
+                drawnow
+            end
+            if lon>=3
+                addpoints(curvesens3,xconsallsensor{n,3}(1),xconsallsensor{n,3}(2));
+                drawnow
+            end
+            if lon>=4
+                addpoints(curvesens4,xconsallsensor{n,4}(1),xconsallsensor{n,4}(2));
+                drawnow
+            end
         end
-        if lon>=2
-            addpoints(curvesens2,xconsallsensor{n,2}(1),xconsallsensor{n,2}(2));
-            drawnow
-        end
-        if lon>=3
-            addpoints(curvesens3,xconsallsensor{n,3}(1),xconsallsensor{n,3}(2));
-            drawnow
-        end
-        if lon>=4
-            addpoints(curvesens4,xconsallsensor{n,4}(1),xconsallsensor{n,4}(2));
-            drawnow
-        end
-       end
-%         for i=1:lon
-%         addpoints(curvesens(i),xconsallsensor{n,i}(1),xconsallsensor{n,i}(2));
-%         drawnow
-%         end
+        %         for i=1:lon
+        %         addpoints(curvesens(i),xconsallsensor{n,i}(1),xconsallsensor{n,i}(2));
+        %         drawnow
+        %         end
     end
     %% to enable to save gifs
-%    if n == 1 
-% frame = getframe(hhh); 
-%       im = frame2im(frame); 
-%       [imind,cm] = rgb2ind(im,256)
-%           imwrite(imind,cm,filename,'gif', 'Loopcount',inf); 
-%    else  
-%    if rem(n,3)==0
-%       frame = getframe(hhh); 
-%       im = frame2im(frame); 
-%       [imind,cm] = rgb2ind(im,256); 
-%       % Write to the GIF File 
-%       
-%           imwrite(imind,cm,filename,'gif','WriteMode','append'); 
-%       end 
-%     end
-%% Video
-if videon == 1
-    frame(n) = getframe(hhh);
-end
+    %    if n == 1
+    % frame = getframe(hhh);
+    %       im = frame2im(frame);
+    %       [imind,cm] = rgb2ind(im,256)
+    %           imwrite(imind,cm,filename,'gif', 'Loopcount',inf);
+    %    else
+    %    if rem(n,3)==0
+    %       frame = getframe(hhh);
+    %       im = frame2im(frame);
+    %       [imind,cm] = rgb2ind(im,256);
+    %       % Write to the GIF File
+    %
+    %           imwrite(imind,cm,filename,'gif','WriteMode','append');
+    %       end
+    %     end
+    %% Video
+    if videon == 1
+        frame(n) = getframe(hhh);
+    end
     n=n+1;
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%% Plot Zone %%%%%%%%%%%%%%%%%%
 if videon==1
-video = VideoWriter('Gif_Movie\Movie_all_sensors.avi', 'Motion JPEG AVI');
-video.FrameRate = 15;
-open(video);
-writeVideo(video, frame);
-close(video);
+    video = VideoWriter('Gif_Movie\Movie_all_sensors.avi', 'Motion JPEG AVI');
+    video.FrameRate = 15;
+    open(video);
+    writeVideo(video, frame);
+    close(video);
 end
 
- hold off
- 
+hold off
+
 if ploton==1
     q=rem(n,rate);
     ab=n-q;
-% diff=statocons(:,(1:rate:n)./rate)-stato(:,1:rate:n); wtf
- diff=statocons(:,1:ncons)-stato(:,1:rate:rate*ncons);
-for i=1:ncons
-    rmspos(i)=norm(diff(1:2,i));
-    rmsvel(i)=norm(diff(3:4,i));
-end
-
-figure(4)
-plot(rmspos)
-
-figure(5)
-plot(rmsvel)
-figure(6)
-plot(stato(3,1:n))
+    
+    diff=statocons-stato(:,1:rate:rate*ncons);
+    for i=1:ncons
+        rmspos(i)=norm(diff(1:2,i));
+        rmsvel(i)=norm(diff(3:4,i));
+    end
+    
+    figure(4)
+    plot(rmspos)
+    
+    figure(5)
+    plot(rmsvel)
+    figure(6)
+    plot(stato(3,1:n))
 end
