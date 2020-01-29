@@ -7,15 +7,16 @@ clc; clear all; close all;
 
 caso=1;
 %delta time
-delta=0.01;
+delta=0.9;
 %at which rate do we do the consensus ?
 rate=1;
 %Maximum number of iteration
-nstop=800;
+nstop=400;
 %Plot
 videon = 0;
-ploton =0;
+ploton =1;
 plotallsenson=0;
+plotallsensed=1;
 switch caso
     
     case 1
@@ -245,10 +246,18 @@ curve3= animatedline('Color','y');
 
 curvesens1= animatedline('Color','m');
 curvesens2= animatedline('Color','c');
-curvesens3= animatedline('Color','k');
-curvesens4= animatedline('Color','y');
+curvesens3= animatedline('Color','y');
+curvesens4= animatedline('Color','k');
+
+
+curvesens5= animatedline('Color','m','Marker','*');
+curvesens6= animatedline('Color','c');
+curvesens7= animatedline('Color','y');
+curvesens8= animatedline('Color','k','Marker','*');
+
 
 if ploton ==1
+plotS=cell(nq,nq);
     hold on
     hhh=figure(1)
     filename = 'testAnimated.gif';
@@ -258,7 +267,8 @@ if ploton ==1
         end
     end
 end
-
+xconsallsensor=cell(nstop,4);
+sensed=cell(nstop,4);
 while (~(isempty(onindices))&&n<nstop)
     x=move(stato(:,n),acc,mode(n),Q,caso,delta,ABG);
     mode(n+1)=markchange(s,Transmat);
@@ -337,6 +347,7 @@ while (~(isempty(onindices))&&n<nstop)
         ll=onindices{i}(2);
         %take a measurement
         sensors{kk,ll}.sense(stato(1:2,n+1));
+        sensed{n,i}=[sensors{kk,ll}.position(1)+sensors{kk,ll}.sensed(1)*cos(sensors{kk,ll}.sensed(2)),sensors{kk,ll}.position(2)+sensors{kk,ll}.sensed(1)*sin(sensors{kk,ll}.sensed(2))];
         %IMM for each sensor on
         
         [sensors{kk,ll}.xmix,sensors{kk,ll}.Pmix...
@@ -455,6 +466,28 @@ while (~(isempty(onindices))&&n<nstop)
             if lon>=4
                 addpoints(curvesens4,xconsallsensor{n,4}(1),xconsallsensor{n,4}(2));
                 drawnow
+            end
+        end
+        if plotallsensed==1
+            if lon>=1
+%                 addpoints(curvesens5,sensed{n,1}(1),sensed{n,1}(2));
+%                 drawnow
+                  plot(sensed{n,1}(1),sensed{n,1}(2),'*','Color','b')
+            end
+            if lon>=2
+%                 addpoints(curvesens6,sensed{n,2}(1),sensed{n,2}(2));
+%                 drawnow
+                  plot(sensed{n,2}(1),sensed{n,2}(2),'*','Color','c')
+            end
+            if lon>=3
+%                 addpoints(curvesens7,sensed{n,3}(1),sensed{n,3}(2));
+%                 drawnow
+                  plot(sensed{n,3}(1),sensed{n,3}(2),'*','Color','m')
+            end
+            if lon>=4
+%                 addpoints(curvesens8,sensed{n,4}(1),sensed{n,4}(2));
+%                 drawnow
+                  plot(sensed{n,4}(1),sensed{n,4}(2),'*','Color','k')
             end
         end
         %         for i=1:lon
