@@ -4,7 +4,7 @@
 \usepackage[utf8]{inputenc} % Unicode support (Umlauts etc.)
 \usepackage[ngerman]{babel} % Change hyphenation rules
 \usepackage{hyperref} % Add a link to your document
-\usepackage{graphicx}[final] % Add pictures to your document
+\usepackage[final]{graphicx} % Add pictures to your document
 \usepackage{listings} % Source code formatting and highlighting
 \usepackage{bookmark}
 \usepackage{natbib}
@@ -19,8 +19,8 @@
 \fancyhead[RE,LO]{Guides and tutorials}
 \fancyfoot[CE,CO]{\leftmark}
 \fancyfoot[LE,RO]{\thepage}
-\graphicspath{{Immagini/}}
-
+\graphicspath{{Immagini//}}
+%C:\Users\erikz\OneDrive\Desktop\PaioPaio2\IMM-Sensors-Network\Latex\Immagini
 \geometry{
  a4paper,
  total={170mm,257mm},
@@ -59,49 +59,57 @@ a sensor grid tracking an object. The object can move with two different model, 
         observations it's not enough, models achiving the best-fit to our data is needed in order to make a prediction and estimate 
         with reduced uncertainty. Here comes to play a major role the IMM algorithm (Interacting Multiple Models): The data
         from sensor are combined with different dynamical models through the algorithm... 
-        \subsection*{Simulation Model}
+        \subsection*{Sensor in simulation model}
             The target can move with random movement described by a Markov chain and accordingly two different models of movement
             The tracking are performed with grid of sensors. In order to perform a proper simulation the sensor has assumed to have a limited
             range for the tracking and we cannot retrive any information if target is out. It also took in consideration the power consumption 
             for a possible physical system: to model a more enegy efficient system the sensor can switch to 3 different working condition: On,Off,Idle.
-            To achive this goal the sensor is working as a state machine as showned in the figure below: \begin{figure}[htp]
+            To achive this goal the sensor is working as a state machine as showned in the figure below: 
+                \begin{figure}[h!]
                 \centering
-                \includegraphics[scale=0.1]{UntitledDiagram.png}
-                \caption{An image of a galaxy}
+                \includegraphics[scale=0.05]{UntitledDiagram.png}
+                \caption{State machine sensor}
                 \label{fig:galaxy}
                 \end{figure}
             Sensors can communicate with the sensors in their neighboorhoods and exchange signal named CanSense and CantSense that regulate the transition
             between differents state. Thus implies that not all the sensors receive all the messagge, but only from their Neighboors. The sensors in On state
             create a fully connected graph. The nodes composing the graph changes dynamically with iterations according with the movements of target. The numbers of
-            sensors turned on depends on working range choosed and position of target.
-
-            {How the sensors works}
-
-            The measurment acquired by eachs sensors are then combined through the theory of linear consensus
-            The filter choosed are the WSL
-            
-            Sensors in the simulations are Radar and the H matrix that reprent the measurment:
-
-        \subsection*{m}
-    
-    \section*{Simulation model implementation}
+            sensors turned on depends on working range choosed and position of target. The mechanism that regulate the transition from sensors state 
+            relay on the information exchanged with nearby sensor. Different state can receive and send different messagesses. A sensor in On state has the moving 
+            object in his range and send a CanSense to the nearby and when trackin moving away from the operating range send a CantSense turning itself to Idle. 
+            Sensors that receive a CanSense and are not already On turn in Idle state; during the Idle state sensors check
+            if object appears in range sensors turn to On and send a CanSense, if nothing trigger the range it send to the nearby a CantSense signal.
+            A sensor that is in Idle and during the information exchange receive only CantSense from the nearby turn itself Off and stop to check if somenthing is in range and
+            can be turned again to Idle via a CanSense. This scheme implies that a sensors can never switch to On from Off except for the initialization step. 
+            When a sensor have the target in range it does a measure operation each timestep. the sensor works a radar in this model and remembering
+            \begin{equation}
+                z(k)=H(k)x(k)+\textbf{R}
+            \end{equation}
+            where the \textbf{H} is 
+            \begin{equation}
+                H= \begin{bmatrix}
+                    dopo & la \\
+                    scr & vo \\
+                \end{bmatrix}
+            \end{equation} 
+        \subsection*{Imm and Linear Consensu}
+               The IMM algorithm is based on the 
+                
+    \section*{Model used}
     Introduction
-    \subsection*{Filter}
-    \subsection*{Sensor}
-    The sensor grid are is composed by a set of sensor that can communicate with each others creating a fully connected graphic
-    The single sensor works as a state machine, and change its state accordingly with the signal exchanged with the neighboors.
-    \begin{figure}[htp]
-        \centering
-        \includegraphics[scale=0.1]{UntitledDiagram.png}
-        \caption{An image of a galaxy}
-        \label{fig:galaxy}
-    \end{figure}
+    
     \subsection*{Random walk and Unycicle model}
-    The target in this simulation can move accordingly to two model: random walk and Unycicle. The genaral expression of the two process it
+    The target in this simulation can move accordingly to two model: random walk and Unycicle. Each of this model has a Markov chain that 
+    regulate how the given input goes in the system. For the random walk we have 5 state: costant velocity, positive or negative acceleration
+     on x direction and positive or negative deceleration on y direction. So the input are $\ddot{x}$ and $\ddot{y}$. The Markov chain associate is a circulant matrix as showned below
+     $$\begin{vmatrix}
+         0.8 & 0.025 & 0.025 & 0.025 & 0.025 // 
+     \end{vmatrix}$$
+     The equation regulating the state of the system is as well know
     \begin{equation}
     X^{+}= \textbf{A}X(k) + \textbf{B}u(k) + \textbf{G}w(k)
     \end{equation}
-    State,state and noise matrix associate to the random walk has showned below:
+    The Random walk model has is a linear model. State,state and noise matrix associate to the random walk has showned below:
     \[ X=\begin{bmatrix} x \\ y \\ \dot{x} \\ \dot{y} \\ \end{bmatrix}  A=\begin{bmatrix}
         1&0&\delta&0\\
         0&1&0&\delta\\
@@ -130,9 +138,31 @@ a sensor grid tracking an object. The object can move with two different model, 
             0 & \delta \\
             \end{bmatrix}
   \]
-   The unycicle model state representation employed has showned below
+  It can be noticed that the \textbf{G} matrix of error can be seen as a sum of positive \textbf{B} rescaled by a random factor.
 
-    
+  The unycicle model has different input and state description. The inputare represente by the angular acceleration of the wheel and the steering angle acceleration.
+  possible state are 5: constant angular velocity, acceleration and deceleration of the wheel and positice or negative acceleration of the steering angle.
+  The associate Markov chain for this case is  
+   $$\begin{vmatrix}
+         0.8 & 0.025 & 0.025 & 0.025 & 0.025 // 
+     \end{vmatrix}$$
+   Unycicle model instead is a Non-linear model. Thus is necessary to use a linearization in the Kalman filter implementation
+   The matrix that represent the state of system for this case are
+    \[ X=\begin{bmatrix} x \\ y \\ \dot{x} \\ \dot{y} \\ \end{bmatrix}  A=\begin{bmatrix}
+   1&0&\delta&0\\
+   0&1&0&\delta\\
+   0&0&1&0\\
+   0&0&0&1\\
+   \end{bmatrix}
+   G=\begin{bmatrix}
+       \delta^2/2&0\\
+       0&\delta^2/2\\
+       \delta&0\\
+       0&\delta\\
+       \end{bmatrix}
+   \]
+    \subsection*{Data's simulation}
+
     \section*{Result}
     The performance evaluation of the system are evaluted by computing the RMS of the predicted trajectory eith the respect to the actual one 
     choosing different rate of performind the WSL. The final result are listed in the table below
