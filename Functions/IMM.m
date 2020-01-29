@@ -52,10 +52,12 @@ for i=1:alto
         [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat,xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso,offset,delta,i);
     end
     %% to avoid error => threshold 
-    if  rcond(S(:,:,i)
+    if  rcond(S(:,:,i))<1e-6
         L(i)=0.001;
-    else
+    elseif all(eig(S(:,:,i))>1e-6)
         L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
+    else
+        "HOW"
     end
     
 end

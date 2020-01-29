@@ -7,11 +7,11 @@ clc; clear all; close all;
 
 caso=1;
 %delta time
-delta=0.01;
+delta=0.05;
 %at which rate do we do the consensus ?
 rate=1;
 %Maximum number of iteration
-nstop=800;
+nstop=2000;
 %Plot
 videon = 0;
 ploton =0;
