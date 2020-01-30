@@ -1,25 +1,26 @@
-\documentclass{article}
+\documentclass[twocolumn]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath} % Advanced math typesetting
 \usepackage[utf8]{inputenc} % Unicode support (Umlauts etc.)
-\usepackage[ngerman]{babel} % Change hyphenation rules
+\usepackage[english]{babel} % Change hyphenation rules
 \usepackage{hyperref} % Add a link to your document
-\usepackage[final]{graphicx} % Add pictures to your document
+\usepackage{graphicx} % Add pictures to your document
 \usepackage{listings} % Source code formatting and highlighting
 \usepackage{bookmark}
 \usepackage{natbib}
 \usepackage{geometry}
-\usepackage{multicol}
+%\usepackage{multicol}
 \usepackage{fancyhdr}
 \usepackage[document]{ragged2e}
- 
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[LE,RO]{Overleaf}
-\fancyhead[RE,LO]{Guides and tutorials}
-\fancyfoot[CE,CO]{\leftmark}
-\fancyfoot[LE,RO]{\thepage}
-\graphicspath{{Immagini//}}
+\usepackage{adjustbox}
+\usepackage{subcaption}
+% \pagestyle{fancy}
+% \fancyhf{}
+% \fancyhead[LE,RO]{Overleaf}
+% \fancyhead[RE,LO]{Guides and tutorials}
+% \fancyfoot[CE,CO]{\leftmark}
+% \fancyfoot[LE,RO]{\thepage}
+\graphicspath{ {Immagini/} }
 %C:\Users\erikz\OneDrive\Desktop\PaioPaio2\IMM-Sensors-Network\Latex\Immagini
 \geometry{
  a4paper,
@@ -51,7 +52,7 @@ The purpouse of this project is to analyze and evaluate the performance of an IM
 agent's tracking. The agent switches between linked models of movement by the means of a Markov chain. The goal is evaluate the best trade-off
 between error on estimated position and real position and number of messagesses involved in the tracking.
 
-\begin{multicols}{2}
+
     \section*{Setting}
     \justify
     NON CAPISCO COSA VUOI DIRE, IN QUALSIASI CASO QUA AGGIUNGI CHE PARLIAMO DI FILTRI DA DISCRETE-DISCRETE
@@ -63,34 +64,59 @@ between error on estimated position and real position and number of messagesses 
     from sensor are combined with different dynamical models through the algorithm...
     \subsection*{Sensor's model}
     The sensors chosen are radars measuring the relative polar cordinates at which the agent is collocated at the timestep, and
-    are disposed as a uniform grid. In order to simulate the real workings of a sensor, we have limited the range of measurement to the distance
+    are disposed as a uniform grid. In order to simulate the real workings of a sensor, range of measuremnt has been limited to the distance
     between one sensor and the following one in any direction of the grid, as soon as the agent exceed the imposed maxiumum distance from the sensor,
     the device will stop sensing.
     This property of the sensor grid, coupled by its geometry, ensures that no more than 4 sensors can measure the agent position at the time,
-    so it made sense to let sensor switch between 3 different states that we named ON, OFF and IDLE. This can be justified as a way to make the system
+    so it made sense to let sensor switch between 3 different states named ON, OFF and IDLE. This can be justified as a way to make the system
     more power efficient and to avoid useless data stream towards sensors that aren't currently in range and sensing.
     The sensor is modeled as a state machine as shown.
     \\
-    AGGIUSTA FIGURA CHE E' SBAGLIATA E NON CI SONO GLI INRANGE, I CANSENSE/CANNOT SONO I SEGNALI MANDATI, NON LE ROBE CHE FANNO CAMBIARE STATO 
     \begin{figure}[h!]
         \centering
-        \includegraphics[scale=0.05]{UntitledDiagram.png}
+        \includegraphics[width=\columnwidth]{sensor_state_machine.png}
         \caption{State machine sensor}
         \label{fig:galaxy}
     \end{figure}
     \\
+Every sensor accordingly with its state can perform some action and send information following the rules listed in the table below
+\\ 
+    \begin{center}
+        \begin{adjustbox}{max width=0.45\textwidth}
+        \begin{tabular}{||c c c c||}
+            \hline
+              & On & 3 Idle & Off \\ [0.5ex]
+            \hline\hline
+            InRange()==      & True      & False  & False    \\
+            \hline
+            Message sent      & CanSense      & CantSense     & X   \\
+            \hline
+            Functions      & measurement    & ready to switch to On    & X   \\
+            \hline
+           
+            \hline
+        \end{tabular}
+    \end{adjustbox}
+    \end{center}
+    
     TABELLA CON LE FUNZIONI DEGLI STATI (mettere di fianco al paragrafo sotto una immagine che fa  vederecosa intendiamo con neighboors (gli 8 
     sensori circostanti))
     \\
     Sensors can communicate with the devices adjacent to them (Neighboorhood) and exchange with them signals named CanSense and CantSense
     which state respectively whenever the agent gets in or goes out of the communicating sensor's range. This check is done through the 
     function inRange() that also serves as a switch between the states of the sensor, as already shown by the figure above.
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.3\textwidth]{Immagini/Neighboors.png}
+        \caption{Neighboors for a sensors are the one immediately adiacent. The purples ones represent the neighboors of green sensor}
+        \label{fig:galaxy}
+    \end{figure}
     \\
-    QUESTO METTILO NEL CONSENSUS, NON HA SENSO PARLARNE QUI
-    \\
-    The set of active sensors inside the grid is dynamic, as vertices keep getting added and popped. However it has to be noticed, as stated before, that no 
-    more than 4 sensors will be ON at any point of time and they will all be adjacent to each other, this let us model the graph of the active 
-    sensors as fully-connected, since the distance between them is short and they are directly linked.
+    % QUESTO METTILO NEL CONSENSUS, NON HA SENSO PARLARNE QUI
+    % \\
+    % The set of active sensors inside the grid is dynamic, as vertices keep getting added and popped. However it has to be noticed, as stated before, that no 
+    % more than 4 sensors will be ON at any point of time and they will all be adjacent to each other, this let us model the graph of the active 
+    % sensors as fully-connected, since the distance between them is short and they are directly linked.
     \\
     Different state can receive and send different messagesses. A sensor in On state has the moving
     object in his range and send a CanSense to the nearby and when trackin moving away from the operating range send a CantSense turning itself to Idle.
@@ -99,37 +125,96 @@ between error on estimated position and real position and number of messagesses 
     A sensor that is in Idle and during the information exchange receive only CantSense from the nearby turn itself Off and stop to check if somenthing is in range and
     can be turned again to Idle via a CanSense. This scheme implies that a sensors can never switch to On from Off except for the initialization step.
     \\
-    When a sensor have the target in range it does a measure operation each timestep. the sensor works a radar in this model and remembering
+    When a sensor have the target in range it does a measure operation each timestep. the sensor works as a radar in this model and remembering
     \begin{equation}
         z(k)=h(x(k))+v(k)
     \end{equation}
-    where $h(x)$ is the polar to cartesian cordinates transfor
+    where $h(x)$ is the polar to cartesian cordinates transform and $v(k)$ is the noise associated to the measurement's operation.
+
     \begin{equation*}
         \begin{bmatrix}
             \rho\\ \alpha
-        \end{bmatrix}=
+        \end{bmatrix}=  
+        \begin{bmatrix}
+            x^2+y^2\\ atan2(y/x)
+        \end{bmatrix} 
     \end{equation*}
-    where the \textbf{H} is
+   for sake of use in the extended Kalman filter, a linearization of $h(x)$ must be performed.
+   The WLS problem associate becomes
+   \begin{equation*}
+       x^{WSL}(k)=arg min(Z^{k}-h(x)W(Z^{k}-h(x))^{T})= argmin J(x,k)
+   \end{equation*}
+   and we have to found 
+   \begin{equation*}
+     \frac{dJ(x,k)}{dx}=0
+\end{equation*}
+After a bit of management we can compute 
+\begin{equation*}
+    J(x,k)=Z^{k}
+\end{equation*}
+        and than it follows that
+        \begin{equation*}
+            \frac{dJ(x,k)}{dx}=-H(x)^{T}W(Z^{K}-h(x))=0
+        \end{equation*}
+        where $H(x)=\frac{dh(x)}{dx}$ So in this particular case:
     \begin{equation}
         H= \begin{bmatrix}
             \frac{x}{(x^{2}+y^{2})^{1/2}} & \frac{y}{(x^{2}+y^{2})^{1/2}}& 0& 0 \\
             \frac{-y}{(x^{2}+y^{2})}  & \frac{x}{(x^{2}+y^{2})}& 0& 0 \\
         \end{bmatrix}
     \end{equation}
-    \subsection*{Imm and Linear Consensu}
-    The IMM algorithm is based on the
+    \subsection*{Imm and Linear Consensus}
+    In order to reach a more accurate prediction of the trajectory a IMM algorithm is implemented in the sensors's grid. The working principles 
+    involves a general knowledge or hypothesis of the model of agent's movement. Every model is used in a Kalman filter stage that use the same measurement and make
+    a prediction: the one with the smaller uncertainty is choose as the model for our agent at that timestep. A general scheme of the working principles is shown here (image?)
+
+
+
+
 
     \section*{Model used}
     Introduction
-
-    \subsection*{Random walk and Unycicle model}
-    The target in this simulation can move accordingly to two families of models, both are Markov processes.
+    Discrete Wiener Process Acceleration Model
+    \subsection*{ Discrete Wiener Process Acceleration Model and Unycicle model}
+    The target in this simulation can move accordingly to two families of models, both are Markov processes: 
+    The Discrete Wienerprocess acceleration model and The Unycle model. The main caratheristic of both are represented in the table below
     \\
-    TABELLA CON DA UNA PARTE LE MODES DI UNO E DELL'ALTRO AL POSTO DI SPIEGARLO A PAROLE
+    % \begin{tabular}{ |c|c|c|c|c|c| }
+    % \multicolumn{6}{|c|}{Models} \\
+    \begin{tabular}{||c |c  | c  |c|c|c|c|c c c c c||}%{|width=\columnwidth|}
+        \hline
+         & DPWA && Unycicle \\
+        \hline
+             & Modes & Input & Modes & Inputs\\ [0.5ex]
+        \hline\hline
+        state 1 & costant velocity      & $\ddot{x},\ddot{y}=0$ & constant angular velocity &  $\ddot{\omega},\ddot{\alpha}=0$   \\
+        \hline
+        state 2  & north acceleration      & $\ddot{x}=\delta$  &  angular acceleration &  $\ddot{\omega}=\delta$ \\
+        \hline
+        state 3  & south acceleration    & $\ddot{x}=-\delta$   &  angular deceleration  & $\ddot{\omega}=-\delta$ \\
+        \hline
+        state 4  & east acceleration    & $\ddot{y}=\delta$    & acceleration steering (CW) & $\ddot{\omega}=\delta$ \\
+        \hline
+        state 5  & west acceleration     & $\ddot{y}=-\delta$  &  acceleration steering (CCW) & $\ddot{\omega}=-\delta$ \\ [1ex]
+        \hline
+    \end{tabular}
     \\
     
-    In the case of the random walk we choosen to have 5 states: costant velocity, positive or negative acceleration
-    on x direction and positive or negative deceleration on y direction. The Transition matrix 
+    In the case of the DWPA we choosen to have 5 states: costant velocity, positive or negative acceleration
+    on x direction and positive or negative deceleration on y direction.
+    \begin{tabular}{||c c c||}%[width=\columnwidth]
+        \hline
+        state 1 & costant velocity      & $\ddot{x},\ddot{y}=0$     \\
+        \hline
+        state 2  & north acceleration      & $\ddot{x}=\delta$        \\
+        \hline
+        state 3  & south acceleration    & $\ddot{x}=-\delta$        \\
+        \hline
+        state 4  & east acceleration    & $\ddot{y}=\delta$     \\
+        \hline
+        state 5  & west acceleration     & $\ddot{y}=-\delta$       \\ [1ex]
+        \hline
+    \end{tabular} The Transition matrix 
     associated with the Markov's chain is shown below
     \begin{equation*}
         \begin{bmatrix}
@@ -143,7 +228,7 @@ between error on estimated position and real position and number of messagesses 
     Where $x(k)$ is the state at the current timestep, $u(t)$ is the input and $w(k)$ is the process noise.
     In this case the state is a vector of the cartesian cordinates and their relative speed, while the input 
     is the acceleration which the noise will influence. 
-    State,state and noise matrix associate to the random walk has shown below:
+    State,state and noise matrix associate to the DWPA has shown below:
     \[ x=\begin{bmatrix} x \\ y \\ \dot{x} \\ \dot{y} \\ \end{bmatrix}  A=\begin{bmatrix}
             1 & 0 & \delta & 0      \\
             0 & 1 & 0      & \delta \\
@@ -161,8 +246,9 @@ between error on estimated position and real position and number of messagesses 
     \\
     We hypothesize that the input is unknown in direction but known in magnitude. This set according to the current state at which the markov process is at the timestep.
     This is modeled though the switch between a set of matrices $B(s)$ that change according to the chain's state $s$.
-    \[
-        B(s)=\begin{Bmatrix}
+    \begin{equation*}%[width=\columnwidth]
+        \resizebox{.9 \columnwidth}{!}{
+        $B(s)=\begin{Bmatrix}
             \begin{bmatrix}
                 0 & 0 \\
                 0          & 0 \\
@@ -193,14 +279,30 @@ between error on estimated position and real position and number of messagesses 
                 0 & 0          \\
                 0 & -\delta     \\
             \end{bmatrix}
-        \end{Bmatrix}
-    \]
+        \end{Bmatrix} $ 
+        }
+    \end{equation*}
+       
+    
     It can be noticed that the matrix $G$ is a merge between the second and the fourth matrices found in the set $B(s)$ as the noise will act
     randomly in direction and magnitude at every time-step.
 
-    The unycicle model has different input and state description. The inputare represente by the angular acceleration of the wheel and the steering angle acceleration.
+    The unycicle model has different input and state description. The input are represented by the angular acceleration of the wheel and the steering angle acceleration.
     possible state are 5: constant angular velocity, acceleration and deceleration of the wheel and positice or negative acceleration of the steering angle.
     The associate Markov chain for this case is
+    \begin{tabular}{||c c c c||}
+        \hline
+        state 1 & 6      & 87837  & 787    \\
+        \hline
+        state 2  & 7      & 78     & 5415   \\
+        \hline
+        state 3      & 545    & 778    & 7507   \\
+        \hline
+        state 4      & 545    & 18744  & 7560   \\
+        \hline
+        state 5      & 88     & 788    & 6344   \\ [1ex]
+        \hline
+    \end{tabular}
     $$\begin{vmatrix}
             0.8 & 0.025 & 0.025 & 0.025 & 0.025 //
         \end{vmatrix}$$
@@ -246,5 +348,5 @@ between error on estimated position and real position and number of messagesses 
 
 
     \subsection*{}
-\end{multicols}
+
 \end{document}

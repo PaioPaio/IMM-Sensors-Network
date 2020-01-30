@@ -5,9 +5,9 @@ clc; clear all; close all;
 %1-> markov chain constant speed or costant acceleration
 %2-> unicycle
 
-caso=2;
+caso=1;
 %delta time
-delta=0.3;
+delta=0.05;
 %at which rate do we do the consensus ?
 rate=1;
 %Maximum number of iteration
