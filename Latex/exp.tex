@@ -48,7 +48,7 @@ Zanolli Erik 198852}
 \section*{Introduction}
 \justify
 The purpouse of this project is to analyze and evaluate the performance of an IMM algorithm's implementation in a distributed environment for
-agent's traking. The agent switches between linked models of movement by the means of a Markov chain. The goal is evaluate the best trade-off
+agent's tracking. The agent switches between linked models of movement by the means of a Markov chain. The goal is evaluate the best trade-off
 between error on estimated position and real position and number of messagesses involved in the tracking.
 
 \begin{multicols}{2}
@@ -62,12 +62,13 @@ between error on estimated position and real position and number of messagesses 
     with reduced uncertainty. Here comes to play a major role the IMM algorithm (Interacting Multiple Models): The data
     from sensor are combined with different dynamical models through the algorithm...
     \subsection*{Sensor's model}
-    The sensors chosen are radars measuring the relative polar cordinates at which the agent is collocated at the timestep and
+    The sensors chosen are radars measuring the relative polar cordinates at which the agent is collocated at the timestep, and
     are disposed as a uniform grid. In order to simulate the real workings of a sensor, we have limited the range of measurement to the distance
-    between one sensor and the following one in any direction in the grid, as soon as the agent exceed the range the device will stop sensing.
+    between one sensor and the following one in any direction of the grid, as soon as the agent exceed the imposed maxiumum distance from the sensor,
+    the device will stop sensing.
     This property of the sensor grid, coupled by its geometry, ensures that no more than 4 sensors can measure the agent position at the time,
     so it made sense to let sensor switch between 3 different states that we named ON, OFF and IDLE. This can be justified as a way to make the system
-    more power efficient and to avoid useless data stream towards sensors that aren't currently in range.
+    more power efficient and to avoid useless data stream towards sensors that aren't currently in range and sensing.
     The sensor is modeled as a state machine as shown.
     \\
     AGGIUSTA FIGURA CHE E' SBAGLIATA E NON CI SONO GLI INRANGE, I CANSENSE/CANNOT SONO I SEGNALI MANDATI, NON LE ROBE CHE FANNO CAMBIARE STATO 
@@ -83,31 +84,36 @@ between error on estimated position and real position and number of messagesses 
     \\
     Sensors can communicate with the devices adjacent to them (Neighboorhood) and exchange with them signals named CanSense and CantSense
     which state respectively whenever the agent gets in or goes out of the communicating sensor's range. This check is done through the 
-    function inRange() that also serves as a switch between the states of the sensor, as already shown by the figure before.
+    function inRange() that also serves as a switch between the states of the sensor, as already shown by the figure above.
     \\
     QUESTO METTILO NEL CONSENSUS, NON HA SENSO PARLARNE QUI
     \\
-    The set of active sensors is dynamic, as vertices keep getting added and popped. However it has to be noticed, as stated before, that no 
+    The set of active sensors inside the grid is dynamic, as vertices keep getting added and popped. However it has to be noticed, as stated before, that no 
     more than 4 sensors will be ON at any point of time and they will all be adjacent to each other, this let us model the graph of the active 
     sensors as fully-connected, since the distance between them is short and they are directly linked.
     \\
-    The nodes composing the graph changes dynamically with iterations according with the movements of target. The numbers of
-    sensors turned on depends on working range choosed and position of target. The mechanism that regulate the transition from sensors state
-    relay on the information exchanged with nearby sensor. Different state can receive and send different messagesses. A sensor in On state has the moving
+    Different state can receive and send different messagesses. A sensor in On state has the moving
     object in his range and send a CanSense to the nearby and when trackin moving away from the operating range send a CantSense turning itself to Idle.
     Sensors that receive a CanSense and are not already On turn in Idle state; during the Idle state sensors check
     if object appears in range sensors turn to On and send a CanSense, if nothing trigger the range it send to the nearby a CantSense signal.
     A sensor that is in Idle and during the information exchange receive only CantSense from the nearby turn itself Off and stop to check if somenthing is in range and
     can be turned again to Idle via a CanSense. This scheme implies that a sensors can never switch to On from Off except for the initialization step.
+    \\
     When a sensor have the target in range it does a measure operation each timestep. the sensor works a radar in this model and remembering
     \begin{equation}
-        z(k)=H(k)x(k)+\textbf{R}
+        z(k)=h(x(k))+v(k)
     \end{equation}
+    where $h(x)$ is the polar to cartesian cordinates transfor
+    \begin{equation*}
+        \begin{bmatrix}
+            \rho\\ \alpha
+        \end{bmatrix}=
+    \end{equation*}
     where the \textbf{H} is
     \begin{equation}
         H= \begin{bmatrix}
-            dopo & la \\
-            scr  & vo \\
+            \frac{x}{(x^{2}+y^{2})^{1/2}} & \frac{y}{(x^{2}+y^{2})^{1/2}}& 0& 0 \\
+            \frac{-y}{(x^{2}+y^{2})}  & \frac{x}{(x^{2}+y^{2})}& 0& 0 \\
         \end{bmatrix}
     \end{equation}
     \subsection*{Imm and Linear Consensu}
@@ -121,19 +127,24 @@ between error on estimated position and real position and number of messagesses 
     \\
     TABELLA CON DA UNA PARTE LE MODES DI UNO E DELL'ALTRO AL POSTO DI SPIEGARLO A PAROLE
     \\
-    Each of this model has a Markov chain that
-    regulate how the given input goes in the system. For the random walk we have 5 state: costant velocity, positive or negative acceleration
-    on x direction and positive or negative deceleration on y direction. So the input are $\ddot{x}$ and $\ddot{y}$. The Transition matrix 
+    
+    In the case of the random walk we choosen to have 5 states: costant velocity, positive or negative acceleration
+    on x direction and positive or negative deceleration on y direction. The Transition matrix 
     associated with the Markov's chain is shown below
-    $$\begin{vmatrix}
+    \begin{equation*}
+        \begin{bmatrix}
             0.8 & 0.025 & 0.025 & 0.025 & 0.025 //
-        \end{vmatrix}$$
+        \end{bmatrix}
+    \end{equation*}
     The linear system describing the evolution of the state is 
     \begin{equation}
-        X^{+}= \textbf{A}X(k) + \textbf{B}u(k) + \textbf{G}w(k)
+        x(k+1)= Ax(k) + B(s)u(k) + Gw(k)
     \end{equation}
+    Where $x(k)$ is the state at the current timestep, $u(t)$ is the input and $w(k)$ is the process noise.
+    In this case the state is a vector of the cartesian cordinates and their relative speed, while the input 
+    is the acceleration which the noise will influence. 
     State,state and noise matrix associate to the random walk has shown below:
-    \[ X=\begin{bmatrix} x \\ y \\ \dot{x} \\ \dot{y} \\ \end{bmatrix}  A=\begin{bmatrix}
+    \[ x=\begin{bmatrix} x \\ y \\ \dot{x} \\ \dot{y} \\ \end{bmatrix}  A=\begin{bmatrix}
             1 & 0 & \delta & 0      \\
             0 & 1 & 0      & \delta \\
             0 & 0 & 1      & 0      \\
@@ -147,9 +158,11 @@ between error on estimated position and real position and number of messagesses 
         \end{bmatrix}
     \]
     With $\delta$ time step of the simulation.
-    The \textbf{B} input matrix change accordingly with the acceleration input (of what we suppose we know only the magnitude)
+    \\
+    We hypothesize that the input is unknown in direction but known in magnitude. This set according to the current state at which the markov process is at the timestep.
+    This is modeled though the switch between a set of matrices $B(s)$ that change according to the chain's state $s$.
     \[
-        B=\begin{Bmatrix}
+        B(s)=\begin{Bmatrix}
             \begin{bmatrix}
                 0 & 0 \\
                 0          & 0 \\
@@ -182,7 +195,8 @@ between error on estimated position and real position and number of messagesses 
             \end{bmatrix}
         \end{Bmatrix}
     \]
-    The \textbf{G} matrix is a merge between the "positive" matrices .
+    It can be noticed that the matrix $G$ is a merge between the second and the fourth matrices found in the set $B(s)$ as the noise will act
+    randomly in direction and magnitude at every time-step.
 
     The unycicle model has different input and state description. The inputare represente by the angular acceleration of the wheel and the steering angle acceleration.
     possible state are 5: constant angular velocity, acceleration and deceleration of the wheel and positice or negative acceleration of the steering angle.
