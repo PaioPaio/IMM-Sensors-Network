@@ -5,18 +5,18 @@ clc; clear all; close all;
 %1-> markov chain constant speed or costant acceleration
 %2-> unicycle
 
-caso=1;
+caso=2;
 %delta time
-delta=0.05;
+delta=0.3;
 %at which rate do we do the consensus ?
 rate=1;
 %Maximum number of iteration
-nstop=2000;
+nstop=100;
 %Plot
 videon = 0;
-ploton =1;
+ploton =0;
 plotallsenson=0;
-plotallsensed=1;
+plotallsensed=0;
 switch caso
     
     case 1
@@ -98,12 +98,13 @@ switch caso
         Transmat(5,:)=[q 0 0 q q1];
         %initial 2D position, velocity and acceleration
         x0=zeros(nx,1);
-        x0([1,2])=0.5;
-        x0(4)=pi/2;
+        x0([1,2])=[-1;-1]+2.*rand(2,1);
+        x0(3)=0.3;
+        x0(4)=pi/3;
         %radius, called like this for reasons
         ABG=0.3;
         %Power spectra density of process noise
-        Q=diag([0.1,0.1]);
+        Q=diag([0.01,0.01]);
         %magnitude of acceleration
         acc=[2;1].*0.1;
         P0=diag([1,1,1,1]);
@@ -143,7 +144,7 @@ mu(:,1)=mu1'; %first state is constant velocity for design and we suppose we kno
 %%
 
 %initialize sensor Grid
-nq=20;      %grid's size (even number plez)
+nq=10;      %grid's size (even number plez)
 sensors=num2cell(zeros(nq));
 %basic sensor proprieties
 for i=1:nq
