@@ -53,12 +53,17 @@ for i=1:alto
     end
     % to avoid error => threshold 
     if  rcond(S(:,:,i))<1e-7
-        L(i)=0.001;
+        L(i)=0.0001;        %this does not happen anymore, better leavethe exception tho
     elseif all(eig(S(:,:,i))>1e-6)
-        L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
-        if L(i)==0
-            "Likelihood=0 perchè dz troppo grande e S piccolina"
-            L(i)=0.001;
+        St=chol(S(:,:,i));
+        dzinv=dz(:,i)'/St;
+        logsqr=sum(log(diag(St)));
+        L(i)=exp(-(sum(dzinv.^2,2))/2-logsqr-2*log(2*pi)/2);
+%         L(i)=mvnpdf(dz(:,i),0,S(:,:,i)); %this causes errors cause matlab
+%         sucks
+        if L(i)<0.0001
+            %"Likelihood=0 perchè dz troppo grande e S piccolina"
+            L(i)=0.0001;
         end
     else
         "S negative definite o qualcosa che non so spiegare"

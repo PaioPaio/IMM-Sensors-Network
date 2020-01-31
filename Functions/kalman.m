@@ -18,12 +18,12 @@ function [xk1,Pk1,dz,S] = kalman(Mat,x,u,z,Pk,Q,R,caso,offset,delta,s)
     dz=z-hx(xpri,caso,offset);
     dz=aggiusta(dz);
     if norm(dz)>3
-        "dz sbagliato"
+ %       "dz sbagliato"
     end
     S=H*Ppri*H'+R;  %covariance update
     if rcond(S)<1e-8
         "S troppo piccola"
-    elseif det(S)>100
+    elseif det(S)>1000
         "S troppo grande"
     end
     W=(Ppri*H')/S;    %kalman weight
