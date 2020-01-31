@@ -51,13 +51,17 @@ for i=1:alto
     else
         [xpred(:,i),Ppred(:,:,i),dz(:,i),S(:,:,i)]=kalman(Mat,xmix(:,i),u,z,Pmix(:,:,i),Q,R,caso,offset,delta,i);
     end
-    %% to avoid error => threshold 
-    if  rcond(S(:,:,i))<1e-6
+    % to avoid error => threshold 
+    if  rcond(S(:,:,i))<1e-7
         L(i)=0.001;
     elseif all(eig(S(:,:,i))>1e-6)
         L(i)=mvnpdf(dz(:,i),0,S(:,:,i));
+        if L(i)==0
+            "Likelihood=0 perchè dz troppo grande e S piccolina"
+            L(i)=0.001;
+        end
     else
-        "HOW"
+        "S negative definite o qualcosa che non so spiegare"
     end
     
 end
@@ -73,7 +77,7 @@ Pkk=zeros(largo);
 for i=1:alto
     Pkk=Pkk+(Ppred(:,:,i)+(xkk-xpred(:,i))*(xkk-xpred(:,i))')*muk1(i);
 end
-if rcond(Pkk)<0.0001
-    "OMEGALUL"
+if rcond(Pkk)<1e-7
+    "P risultato IMM troppo piccola"
 end
 end

@@ -7,14 +7,14 @@ clc; clear all; close all;
 
 caso=2;
 %delta time
-delta=0.1;
+delta=0.3;
 %at which rate do we do the consensus ?
 rate=1;
 %Maximum number of iteration
 nstop=1000;
 %Plot
 videon = 0;
-ploton =0;
+ploton =1;
 plotallsenson=0;
 plotallsensed=0;
 switch caso
@@ -116,7 +116,7 @@ s=1;
 
 %Senosors
 range=10;
-R=diag([0.01,(2*pi/360)^2]);               %sensor covariance
+R=diag([0.1,(2*pi/180)^2]);               %sensor covariance
 
 %real state and mode
 stato=zeros(nx,10); %vector of the real state of the moving object
@@ -374,7 +374,7 @@ while (~(isempty(onindices))&&n<nstop)
     %Here we have a dynamic (vertexes can go in and out) fully connected
     %graph
     
-    if rem(n,rate)==0
+    if rem(n,rate)==0 && n~=1
         % (n+1) is the current iteration of the movement, so we sense that
         % and we cant to do consensus on that. We already have initiated
         % the first consensus at x0 and P0 with at n=1 out of the loop, so
@@ -392,7 +392,6 @@ while (~(isempty(onindices))&&n<nstop)
             sensors{kk,ll}.xcons=statocons(:,ncons+1);
             sensors{kk,ll}.Pcons=Pcons(:,:,ncons+1);
             sensors{kk,ll}.mu=mucons(:,ncons+1);
-%             sensors{kk,ll}.mu=sensors{kk,ll}.mu';
             %pick xcons of all on sensors
             %
             xconsallsensor{n,i}=sensors{kk,ll}.xcons;
@@ -428,11 +427,7 @@ while (~(isempty(onindices))&&n<nstop)
         end
     end
     
-    if rate==1
-    if length(stato)>length(statocons)
-        "sfasato wtf"
-    end
-    end
+    
     
     
     xsens=[];

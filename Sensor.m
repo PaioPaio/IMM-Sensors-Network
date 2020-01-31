@@ -136,8 +136,7 @@ classdef Sensor<handle
                 %all the kalman estimates
                 xpred1=[xpred1;sensorgrid{kk,ll}.xpred];
                 wantPpred{i}(:,:,:)=sensorgrid{kk,ll}.Ppred;
-                mu1=[mu1;sensorgrid{kk,ll}.mu];
-                muijg=blkdiag(muijg,sensorgrid{kk,ll}.muij);
+                mu1=[mu1,sensorgrid{kk,ll}.mu];
                 Hcons=[Hcons;eye(lungstato)];
                 Hmu=[Hmu;eye(nummarkov)];
             end
@@ -147,7 +146,7 @@ classdef Sensor<handle
             %H is gonna be a stacked matrix of identities since our measure
             %is exactly zmix
             [obj.xcons,obj.Pcons]=WLS(xcons1,covmix,Hcons);
-            [obj.mu,obj.muij]=WLS(mu1,muijg,Hmu);
+            obj.mu=mean(mu1,2);
             %kalman
             for j=1:nummarkov
                 Cpred=[];

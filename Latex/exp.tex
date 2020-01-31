@@ -125,10 +125,21 @@ Every sensor accordingly with its state can perform some action and send informa
     A sensor that is in Idle and during the information exchange receive only CantSense from the nearby turn itself Off and stop to check if somenthing is in range and
     can be turned again to Idle via a CanSense. This scheme implies that a sensors can never switch to On from Off except for the initialization step.
     \\
-    When a sensor have the target in range it does a measure operation each timestep. the sensor works as a radar in this model and remembering
-    \begin{equation}
-        z(k)=h(x(k))+v(k)
-    \end{equation}
+    Whenever the target is in range of a sensor, the device takes a measurement at each timestep.
+    The model we choose for our measurement device is a radar and as such the measurement function 
+    $z(k)=h(x(k))+v(k)$ associated with it is the cartesian to polar transformation, as shown below
+    \begin{align*}
+        &z(k)=h(x(k))+v(k)\\
+        &\begin{bmatrix}
+            \rho(k)\\ \alpha(k)
+        \end{bmatrix}=  
+        \begin{bmatrix}
+            \sqrt{x(k)^2+y(k)^2}\\ atan2(y(k)/x(k))
+        \end{bmatrix} +
+        \begin{bmatrix}
+            v_{1}(k)\\v_{2}(k)
+        \end{bmatrix}
+    \end{align*}
     where $h(x)$ is the polar to cartesian cordinates transform and $v(k)$ is the noise associated to the measurement's operation.
 
     \begin{equation*}
