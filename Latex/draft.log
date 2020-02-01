@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2019.12.20)  1 FEB 2020 21:45
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/W32TeX) (preloaded format=pdflatex 2019.12.20)  2 FEB 2020 00:01
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -526,29 +526,22 @@ Overfull \hbox (3.98534pt too wide) in paragraph at lines 270--287
  []
 
 
-Underfull \hbox (badness 1122) in paragraph at lines 368--372
-\OT1/cmr/m/n/10 gen-eral knowl-edge or hy-poth-e-sis of the model of
+Underfull \hbox (badness 1472) in paragraph at lines 369--380
+\OT1/cmr/m/n/10 mode evolves to the mem-o-ry-less ran-dom pro-cess
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 368--372
-
+[3]
+Overfull \hbox (122.81897pt too wide) in paragraph at lines 431--458
+ [] 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 374--378
-
- []
-
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 404.
-[3] [4
-
-]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 404.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 462.
+[4]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 462.
  (c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/draft.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 404.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 404.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 404.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 462.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 462.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 462.
  ) 
 Here is how much of TeX's memory you used:
  11201 strings out of 492163
@@ -557,12 +550,12 @@ Here is how much of TeX's memory you used:
  15333 multiletter control sequences out of 15000+600000
  9110 words of font info for 35 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 62i,16n,100p,283b,405s stack positions out of 5000i,500n,10000p,200000b,80000s
- <c:/Users/Lorenzo/.texlive2019/texmf-var/fonts/pk/ljfour/public/bbm/bbm10.600pk><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
-Output written on c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/draft.pdf (4 pages, 182770 bytes).
+ 62i,16n,100p,283b,419s stack positions out of 5000i,500n,10000p,200000b,80000s
+ <c:/Users/Lorenzo/.texlive2019/texmf-var/fonts/pk/ljfour/public/bbm/bbm10.600pk><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb><c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb>
+Output written on c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/draft.pdf (4 pages, 198828 bytes).
 PDF statistics:
- 106 PDF objects out of 1000 (max. 8388607)
- 81 compressed objects within 1 object stream
+ 111 PDF objects out of 1000 (max. 8388607)
+ 85 compressed objects within 1 object stream
  20 named destinations out of 1000 (max. 500000)
  16 words of extra memory for PDF output out of 10000 (max. 10000000)
 

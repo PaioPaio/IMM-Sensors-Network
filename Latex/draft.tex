@@ -183,10 +183,10 @@ Here we enumerate such allowed actions:
     Every member of the set has the same structure 
     to describe their dynamics, in state space this their shared linear model
     \begin{equation}
-        x(k+1)= Ax(k) + B(s)u + Gw(k)
+        x(k+1)= Ax(k) + B(s_{k})u + Gw(k)
     \end{equation}
-    where $A$ is the state matrix, $B(s)$ the input matrix function of the mode/index $s$ that indicates the element picked of $\mathbbm{M}_{1}$, 
-    $u$ is the input that stays constant at all timesteps $k$ and in all modes $s$, $G$ the noise matrix and $w(k)$ the process noise at timestep
+    where $A$ is the state matrix, $B(s_{k})$ the input matrix function of the mode/index $s_{k}$ that indicates the element picked of $\mathbbm{M}_{1}$, 
+    $u$ is the input that stays constant at all timesteps $k$ and in all modes $s_{k}$, $G$ the noise matrix and $w(k)$ the process noise at timestep
      $k$ with associated $Q_{1}$ diagonal power spectral density matrix.
      \begin{equation*}
         Q_{1}=\begin{bmatrix}
@@ -209,12 +209,12 @@ Here we enumerate such allowed actions:
     \end{bmatrix}
 \]
 Where $x$ and $y$ are the cartesian coordinates in the absolute reference frame and $\delta$ is the duration of each timestep $k$.
-To model different behaviours of the agent/elements in the set $\mathbbm{M}_{1}$ we use switching matrices $B(s)$ while keeping the vector $u$ 
+To model different behaviours of the agent/elements in the set $\mathbbm{M}_{1}$ we use switching matrices $B(s_{k})$ while keeping the vector $u$ 
 constant. The input $u$ here is a vector of acceleration in $x$ and $y$ that the noise $w(k)$ will influence.
-We hypothesize that the input is always known in magnitude and constant. Here is the set $B(s)$ of input matrices.
+We hypothesize that the input is always known in magnitude and constant. Here is the set $B(s_{k})$ of input matrices.
     \begin{equation*}%[width=\columnwidth]
         \resizebox{.9 \columnwidth}{!}{
-        $B(s)=\begin{Bmatrix}
+        $B(s_{k})=\begin{Bmatrix}
             \begin{bmatrix}
                 0 & 0 \\
                 0          & 0 \\
@@ -249,7 +249,7 @@ We hypothesize that the input is always known in magnitude and constant. Here is
         }
     \end{equation*}
     \\
-    It is to note that the matrix $G$ is a merge between the second and the fourth matrices found in the set $B(s)$ as we hyphotesized that 
+    It is to note that the matrix $G$ is a merge between the second and the fourth matrices found in the set $B(s_{k})$ as we hyphotesized that 
      the noise will act randomly in direction and magnitude at every time-step.
 \\
 The jump between behaviours is modeled by a Markov chain that has a constant stochastic transition matrix $T$.
@@ -285,9 +285,9 @@ In the case of the Random Unicycle Turning we also consider the set $\mathbbm{M}
             \hline
         \end{tabular}
     \end{center}
-Here all the elements in the set $\mathbbm{M}_{2}$ are non-linear models $x(k+1)=f(x(k),u(k),w(k),s)$, but if we can still organize them in such a way
+Here all the elements in the set $\mathbbm{M}_{2}$ are non-linear models $x(k+1)=f(x(k),u(k),w(k),s_{k})$, but if we can still organize them in such a way
     \begin{equation}
-        x(k+1)= A(x(k))x(k) + B(s,x(k))u(k) + G(x(k))w(k)
+        x(k+1)= A(x(k))x(k) + B(s_{k},x(k))u(k) + G(x(k))w(k)
     \end{equation}
 By defining
     \begin{equation*}      
@@ -308,7 +308,7 @@ By defining
 and 
 \begin{equation*}%[width=\columnwidth]
     \resizebox{.99 \columnwidth}{!}{
-    $B(s,k)=\begin{Bmatrix}
+    $B(s_{k},k)=\begin{Bmatrix}
         \begin{bmatrix}
             0 & 0 \\
             0          & 0 \\
@@ -364,40 +364,98 @@ The stochastic transition matrix in this case will be
     \end{bmatrix}
 \end{equation*}
 where $p_{0}$ and $q_{0}$ are fixed while $p$ and $q$ are computed to make the matrix stochastic.
-\section*{IMM}
-    In order to reach a more accurate prediction of the trajectory a IMM algorithm is implemented in the sensors's grid. The working principles 
-    involves a general knowledge or hypothesis of the model of agent's movement. Every model is used in a Kalman filter stage that use the same measurement and make
-    a prediction: the one with the smaller uncertainty is choose as the model for our agent at that timestep. A general scheme of the working principles is shown here (image?)
-    \\
 
-    \section*{Consensus}
-    The set of active sensors inside the grid is dynamic, as vertices keep getting added and popped. However it has to be noticed, as stated before, that no 
-     more than 4 sensors will be ON at any point of time and they will all be adjacent to each other, this let us model the graph of the active 
-     sensors as fully-connected, since the distance between them is short and they are directly linked.
+\section*{IMM}
+Being the agent's dynamic costantly switching between the models in the set choosen, a single kalman filter won't give us acceptable results while 
+tracking and we have to rely on the Interacting Multiple Models algorithm (IMM). In essence the algorithm let various estimation filters work in parallel
+ (EKF in our case), and outputs a mixture of the filters' estimate based on the probability of each of the models used in the filter to be correct.
+ \\
+The hyphotheses we have to make in order to use the IMM are that the sequence of the true mode at timestep $k$, $s_{k}$, is a Markovian process, i.e. the mode evolves to the 
+memoryless random process $P\{s_{k+1}^{j}|s_{k}^{i}\}\pi_{ji}$ $\forall\ j,i$ and that the model set $\mathbbm{M}$ is the correct one and is time-invariant.
+In our case those hypotheses are known to be true.
+\\
+ The design parameters of the IMM are the model set $\mathbbm{M}$, the process and measurement noise spectral density matrices $Q$ and $R$, the initial 
+ state and covariance $\hat{x}_{0|0}$ and $P_{0|0}$ and the transition matrix $T$ containing all the $\pi_{ji}$.
+ The algorithm can be subdivided in 4 subsections, :
+ \begin{itemize}
+     \item Model Conditioned reinitialization $\forall m_{i},m_{j}\in \mathbbm{M}$
+     \begin{align*}
+                &\mu^{(i)}_{k|k-1}=\sum_{j}\pi_{ji}\mu^{(j)}_{k-1}\\
+                &\mu^{(j|i)}_{k-1}=\pi_{ji}\mu^{(j)}_{k-1}/\mu^{(i)}_{k|k-1}\\
+                &\bar{x}^{(i)}_{k-1|k-1}=\sum_{j}\hat{x}^{(j)}_{k-1|k-1}\mu^{j|i}_{k-1}\\
+                &\bar{P}^{(i)}_{k-1|k-1}=\sum_{j}[P^{(j)}_{k-1|k-1}+(\bar{x}^{(i)}_{k-1|k-1}\\
+                &-\hat{x}^{(j)}_{k-1|k-1})(\bar{x}^{(i)}_{k-1|k-1}-\hat{x}^{(j)}_{k-1|k-1})']\mu_{k-1}^{j|i}
+    \end{align*}
+        Here we take all the model probabilities computed at the previous step and mix them together with the 
+        transition matrix to then use the result to combine both the previous step state and covariance estimation.
+     \item Model Conditioned filtering, in our case EKF $\forall m_{i}\in \mathbbm{M}$
+        \begin{align*}
+            &\\
+            &\\
+            &\\
+            &\\
+            &\\
+            &\\
+        \end{align*}
+     \item Model Probability update $\forall m_{i},m_{j}\in \mathbbm{M}$
+     \item Estimate fusion
+ \end{itemize}
+\section*{Consensus}
+    Right having computed the IMM's estimate for every ON sensor, we use a consensus algorithm to try to lower the 
+    estimation error even more. The consensus will happen at a variable rate and only between the ON sensors.
+    The set of active sensors inside the grid is dynamic, as vertices keep getting added and popped. However no
+     more than 4 sensors will be ON at any point of time, see \ref{fig:number}, and they will all be adjacent to each other, 
+     this let us model the graph of the active sensors as fully-connected, since the distance between them is short 
+     and we imagine them to be directly linked.
+     \\
+     This modeling let us use a Weighted Least Squared estimation of the best measure between all the ON sensors, since this operation 
+     gives us a consensus in a single timestep, which is what we need with both a dynamic graph and a dynamic system.
+    So for our system we get 
+    \begin{align*}
+        &P_{cons}(k)=(H^{k^{T}}P^{k^{-1}}H^{k})^{-1}\\
+        &x_{cons}(k)=P_{cons}H^{k^{T}}P^{k^{-1}}Z^{k}
+    \end{align*}
+    where $P^{k}$ is the block diagonal matrix built with all the covariance matrices from the IMM's output, $Z^{k}$ 
+    is the measurement vector built by stacking all the state predictions from the IMM's output and $H^{k}$ is the matrix build by 
+    stacking all the $H_{i}$ for $z_{i}=H_{i}x+\epsilon_{i}$, luckily in our case all $H_{i}$ are identity matrices.\\
+     It has to be noted that the WLS can be seen as 2 parallel linear consensus algorithms, running one on top of the other.
     \\
+    We also tentatively tried to use the same consensus algorithm on the prediction vector of model probabilities $\mu_{k}$ using 
+    the collection of all $\mu^{j|i}_{k-1}$ in matrix form instead of the covariance matrix for the weighting matrix, but 
+    the resulting matrix was too close to singularity and the simulation was having numerical problems so this road 
+    was abandoned, instead we just computed the mean between the various $\mu_{k}$. 
     \section*{Result}
     The performance evaluation of the system are evaluted by computing the RMS of the predicted trajectory eith the respect to the actual one
     choosing different rate of performind the WSL. The final result are listed in the table below
-
-
     \begin{center}
-        \begin{tabular}{||c c c c||}
+        \begin{tabular}{ |c||c|c|c|  }
             \hline
-            1 step & 2 step & 3 step & 4 step \\ [0.5ex]
-            \hline\hline
-            1      & 6      & 87837  & 787    \\
+            \multicolumn{4}{|c|}{consensus20} \\
             \hline
-            2      & 7      & 78     & 5415   \\
+            IMM  & Mean of Imm's mean    & Max of Imm's mean     & max of IMM's max  \\ [0.5ex]
             \hline
-            3      & 545    & 778    & 7507   \\
+            R1,Q1           & 0.1078                & 0.2578                & 0.3960                 \\
+                \hline
+                R1,Q2           & 0.1094                & 0.2694             & 0.4671                      \\
+                \hline
+                R2,Q1           & 0.0505                &  0.1210           & 0.2491                         \\
+                \hline
+                R2,Q2           & 0.0514                & 0.1313             & 0.2549                   \\
             \hline
-            4      & 545    & 18744  & 7560   \\
+            \multicolumn{4}{|c|}{consensus20} \\
             \hline
-            5      & 88     & 788    & 6344   \\ [1ex]
+            W/o Cons  & Mean of Imm's mean    & Max of Imm's mean     & max of IMM's max  \\ 
             \hline
-        \end{tabular}
-    \end{center}
-
+            R1,Q1           & 0.1609                & 0.1762                & 2.0937                 \\
+            \hline
+            R1,Q2           & 0.1625                & 0.1907             & 1.0347                     \\
+            \hline
+            R2,Q1           & 0.0799               &  0.0877           & 0.4310                         \\
+            \hline
+            R2,Q2           & 0.0815                & 0.0926            & 0.4445                   \\
+        \hline
+           \end{tabular}
+        \end{center}
 
     \subsection*{}
 
