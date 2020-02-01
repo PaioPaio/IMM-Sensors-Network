@@ -418,7 +418,11 @@ for y=1:nmonte
                 ll=onindices{i}(2);
                 sensors{kk,ll}.xcons=statocons(:,ncons+1);
                 sensors{kk,ll}.Pcons=Pcons(:,:,ncons+1);
+                if rate > 3
                 sensors{kk,ll}.mu=mucons(:,ncons+1);
+                else
+                sensors{kk,ll}.mu=sensors{kk,ll}.mu';
+                end
                 %             sensors{kk,ll}.mu=sensors{kk,ll}.mu';
                 %pick xcons of all on sensors
                 %
@@ -600,12 +604,6 @@ if plotresults==1
     title('Consensus IMM Error Norm on Position')
     ylabel('|dx| [m]')
     xlabel('Consensus number [k]')
-    
-%     figure(4)
-%     plot(rmspos)
-%     title('IMM Prediction Error Norm on Position')
-%     ylabel('|dx| [m]')
-%     xlabel('Consensus number [k]')
     
     figure(5)
     switch caso
