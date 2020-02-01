@@ -5,15 +5,15 @@ clc; clear all; close all;
 %1-> markov chain constant speed or costant acceleration
 %2-> unicycle
 
-caso=2;
+caso=1;
 %delta time
 delta=0.05;
 %at which rate do we do the consensus ?
 rate=5;
 %Maximum number of iteration
-nstop=100;
+nstop=1000;
 %iterations montecarlo
-nmonte=10;
+nmonte=100;
 %Plot
 videon = 0;
 ploton =0;
@@ -391,11 +391,6 @@ for y=1:nmonte
             xksens=[xksens;sensors{kk,ll}.xpred];
             Pksens{i}(:,:,:)=sensors{kk,ll}.Ppred;
             muijsens=blkdiag(muijsens,sensors{kk,ll}.muij);
-
-            for a=1:5
-            senprederr{n,i,a}=norm(sensors{kk,ll}.xpred(1:2,a)-stato(1:2,n+1));
-            end
-            meansenprederr(n)=rms(senprederr{n,i});
         end
         
         %WLS can be seen as 2 linear consensus algorithms running in parallel
@@ -607,11 +602,11 @@ if plotresults==1
     ylabel('|dx| [m]')
     xlabel('Consensus number [k]')
     
-    figure(4)
-    plot(rmspos)
-    title('IMM Prediction Error Norm on Position')
-    ylabel('|dx| [m]')
-    xlabel('Consensus number [k]')
+%     figure(4)
+%     plot(rmspos)
+%     title('IMM Prediction Error Norm on Position')
+%     ylabel('|dx| [m]')
+%     xlabel('Consensus number [k]')
     
     figure(5)
     switch caso
