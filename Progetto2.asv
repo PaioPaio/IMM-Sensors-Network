@@ -596,10 +596,9 @@ if plotresults==1
     
     figure(4)
     plot(rmspos)
-    title('IMM Prediction Error Norm on Position')
+    title('IMM Error Norm on Position')
     ylabel('|dx| [m]')
     xlabel('Consensus number [k]')
-    
     figure(5)
     switch caso
         case 1
