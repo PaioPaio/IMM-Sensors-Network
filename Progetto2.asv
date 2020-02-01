@@ -9,7 +9,7 @@ caso=2;
 %delta time
 delta=0.05;
 %at which rate do we do the consensus ?
-rate=10000;
+rate=10;
 %Maximum number of iteration
 nstop=1000;
 %iterations montecarlo
@@ -116,7 +116,7 @@ s=1;
 
 %Senosors
 range=10;
-R=diag([0.01,(2*pi/360)^2]);               %sensor covariance
+R=diag([0.1,(2*pi/180)^2]);               %sensor covariance
 
 rmserr=[];
 maxerr=[];
@@ -626,7 +626,7 @@ fig5.WindowState = 'maximized';
             title('Consensus IMM Error Norm on Tangential Speed')
             ylabel('|dv| [m/s]')
             xlabel('Consensus number [k]')
-            figure(6)
+           fig6= figure(6)
 fig6.WindowState = 'maximized';
             plot(rmsang);
             title('Consensus IMM Error Norm on Yaw Angle')
@@ -685,6 +685,7 @@ maxmaxnocons=max(maxerrnocons)
 
 saveas(fig4,'errpos.png')
 saveas(fig5,'errorspeed.png')
+saveas(fig6,'erroryaw.png')
 saveas(fig8,'maxIMM.png')
 saveas(fig3,'errnocons.png')
 saveas(fig11,'maxnocons.png')

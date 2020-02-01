@@ -447,25 +447,33 @@ After a bit of management we can compute
 
     
     \begin{center}
-        \resizebox{.99\columnwidth}{!}{ $
-        \begin{tabular}{||c||c |c |c|c| |}%{|width=\columnwidth|}
+        \resizebox{.98\columnwidth}{!}{ $
+        \begin{tabular}{||c||c|c|c|c|||}%{|width=\columnwidth|}
             \hline
-             Consensus rate 20  \\
+             Case 1 Consensus rate 20  \\
             \hline\hline
-              & Mean of Imm's mean & Max of Imm's mean & max of IMM's max  \\ [0.5ex]
+                            & Mean of Imm's mean    & Max of Imm's mean     & max of IMM's max  \\ [0.5ex]
             \hline\hline
-            R1,Q1  & costant angular velocity      & $u(k)=0$    \\
+            R1,Q1           & 0.1078                & 0.2578                & 0.3960                 \\
             \hline
-            R1,Q2   & angular acceleration      & $u(k)=a $  \\
+            R1,Q2           & 0.1094                & 0.2694             & 0.4671                      \\
             \hline
-            R2,Q1   & angular deceleration    & $u(k)=-a $   \\
+            R2,Q1           & 0.0505                &  0.1210           & 0.2491                         \\
             \hline
-            R2,Q2  & steer angle acceleration (CW)    & $u(k)=a $    \\
-            \hline
-           
+            R2,Q2           & 0.0514                & 0.1313             & 0.2549                   \\
+            \hline\hline
         \end{tabular} 
-        \\
-        \begin{tabular}{||c||c |c |c|c| |}%{|width=\columnwidth|}
+        $}
+    \end{center}
+
+
+
+
+
+
+    \begin{center}
+        \resizebox{.98\columnwidth}{!}{ $
+        \begin{tabular}{||c||c |c |c|c||}%{|width=\columnwidth|}
             \hline
              Consensus rate 20  \\
             \hline\hline
@@ -483,26 +491,84 @@ After a bit of management we can compute
         \end{tabular} $}
     \end{center}
 
-    
     \begin{center}
-        \resizebox{.99\columnwidth}{!}{ $
-        \begin{tabular}{||c||c |c |c|c| |}%{|width=\columnwidth|}
+        \resizebox{.98\columnwidth}{!}{ $
+    \begin{tabular}{ |c||c|c|c|  }
+        \hline
+        \multicolumn{4}{|c|}{consensus20} \\
+        \hline
+        IMM  & Mean of Imm's mean    & Max of Imm's mean     & max of IMM's max  \\ [0.5ex]
+        \hline
+        R1,Q1           & 0.1078                & 0.2578                & 0.3960                 \\
             \hline
-             Consensus rate 20  \\
-            \hline\hline
-              & Mean of Imm's mean & Max of Imm's mean & max of IMM's max  \\ [0.5ex]
-            \hline\hline
-            R1,Q1  & costant angular velocity      & $u(k)=0$    \\
+            R1,Q2           & 0.1094                & 0.2694             & 0.4671                      \\
             \hline
-            R1,Q2   & angular acceleration      & $u(k)=a $  \\
+            R2,Q1           & 0.0505                &  0.1210           & 0.2491                         \\
             \hline
-            R2,Q1   & angular deceleration    & $u(k)=-a $   \\
+            R2,Q2           & 0.0514                & 0.1313             & 0.2549                   \\
+        \hline
+        \multicolumn{4}{|c|}{consensus20} \\
+        \hline
+        W/o Cons  & Mean of Imm's mean    & Max of Imm's mean     & max of IMM's max  \\ 
+        \hline
+        R1,Q1           & 0.1609                & 0.1762                & 2.0937                 \\
+        \hline
+        R1,Q2           & 0.1625                & 0.1907             & 1.0347                     \\
+        \hline
+        R2,Q1           & 0.0799               &  0.0877           & 0.4310                         \\
+        \hline
+        R2,Q2           & 0.0815                & 0.0926            & 0.4445                   \\
+    \hline
+       \end{tabular} $}
+    \end{center}
+
+
+
+
+    \begin{center}
+        \resizebox{.98\columnwidth}{!}{ $
+    \begin{tabular}{ |c||c|c|c|  }
+        \hline
+        \multicolumn{4}{|c|}{} \\
+        \hline
+        IMM  & Mean of Imm's mean    & Max of Imm's mean     & max of IMM's max  \\ [0.5ex]
+        \hline
+        R1,Q1           & 0.1078                & 0.2578                & 0.3960                 \\
             \hline
-            R2,Q2  & steer angle acceleration (CW)    & $u(k)=a $    \\
+            R1,Q2           & 0.1094                & 0.2694             & 0.4671                      \\
             \hline
-           
-        \end{tabular} $}
+            R2,Q1           & 0.0505                &  0.1210           & 0.2491                         \\
+            \hline
+            R2,Q2           & 0.0514                & 0.1313             & 0.2549                   \\
+        \hline
+        \multicolumn{4}{|c|}{Consensus rate 10} \\
+        \hline
+        W/o Cons  & Mean of Imm's mean    & Max of Imm's mean     & max of IMM's max  \\ 
+        \hline
+        R1,Q1           & 0.1609                & 0.1762                & 2.0937                 \\
+        \hline
+        R1,Q2           & 0.1625                & 0.1907             & 1.0347                     \\
+        \hline
+        R2,Q1           & 0.0799               &  0.0877           & 0.4310                         \\
+        \hline
+        R2,Q2           & 0.0815                & 0.0926            & 0.4445                   \\
+    \hline
+       \end{tabular} $}
     \end{center}
 
 
 \end{document}
+
+mediamedienocons =
+
+    0.1795
+
+
+maxmedianocons =
+
+    0.2145
+
+
+maxmaxnocons =
+
+    0.9872

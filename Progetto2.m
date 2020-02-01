@@ -105,7 +105,7 @@ switch caso
         %radius, called like this for reasons
         ABG=0.5;
         %Power spectra density of process noise
-        Q=diag([0.2,0.2]);
+        Q=diag([1,1]);
         %magnitude of acceleration
         acc=[1;2].*3;
         P0=diag([1,1,1,1]);
@@ -626,7 +626,7 @@ fig5.WindowState = 'maximized';
             title('Consensus IMM Error Norm on Tangential Speed')
             ylabel('|dv| [m/s]')
             xlabel('Consensus number [k]')
-            figure(6)
+           fig6= figure(6)
 fig6.WindowState = 'maximized';
             plot(rmsang);
             title('Consensus IMM Error Norm on Yaw Angle')
@@ -685,6 +685,7 @@ maxmaxnocons=max(maxerrnocons)
 
 saveas(fig4,'errpos.png')
 saveas(fig5,'errorspeed.png')
+saveas(fig6,'erroryaw.png')
 saveas(fig8,'maxIMM.png')
 saveas(fig3,'errnocons.png')
 saveas(fig11,'maxnocons.png')

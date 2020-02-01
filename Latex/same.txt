@@ -1,0 +1,67 @@
+\begin{center}
+        \resizebox{.98\columnwidth}{!}{ $
+        \begin{tabular}{||c||c |c |c|c||}%{|width=\columnwidth|}
+            \hline
+             Consensus rate 20  \\
+            \hline\hline
+              & Mean of Imm's mean & Max of Imm's mean & max of IMM's max  \\ [0.5ex]
+            \hline\hline
+            R1,Q1  & costant angular velocity      & $u(k)=0$    \\
+            \hline
+            R1,Q2   & angular acceleration      & $u(k)=a $  \\
+            \hline
+            R2,Q1   & angular deceleration    & $u(k)=-a $   \\
+            \hline
+            R2,Q2  & steer angle acceleration (CW)    & $u(k)=a $    \\
+            \hline
+           
+        \end{tabular} $}
+    \end{center}
+
+    \begin{center}
+    \begin{tabular}{ |c||c|c|c|  }
+        \hline
+        \multicolumn{4}{|c|}{consensus20} \\
+        \hline
+        IMM  & Mean of Imm's mean    & Max of Imm's mean     & max of IMM's max  \\ [0.5ex]
+        \hline
+        R1,Q1           & 0.1078                & 0.2578                & 0.3960                 \\
+            \hline
+            R1,Q2           & 0.1094                & 0.2694             & 0.4671                      \\
+            \hline
+            R2,Q1           & 0.0505                &  0.1210           & 0.2491                         \\
+            \hline
+            R2,Q2           & 0.0514                & 0.1313             & 0.2549                   \\
+        \hline
+        \multicolumn{4}{|c|}{consensus20} \\
+        \hline
+        W/o Cons  & Mean of Imm's mean    & Max of Imm's mean     & max of IMM's max  \\ 
+        \hline
+        R1,Q1           & 0.1609                & 0.1762                & 2.0937                 \\
+        \hline
+        R1,Q2           & 0.1625                & 0.1907             & 1.0347                     \\
+        \hline
+        R2,Q1           & 0.0799               &  0.0877           & 0.4310                         \\
+        \hline
+        R2,Q2           & 0.0815                & 0.0926            & 0.4445                   \\
+    \hline
+       \end{tabular}
+    \end{center}
+
+
+    
+    
+mediamedienocons =
+
+    0.0843
+
+
+maxmedianocons =
+
+    0.1090
+
+
+maxmaxnocons =
+
+    0.9289
+    
