@@ -11,9 +11,9 @@ delta=0.05;
 %at which rate do we do the consensus ?
 rate=5;
 %Maximum number of iteration
-nstop=100;
+nstop=1000;
 %iterations montecarlo
-nmonte=10;
+nmonte=100;
 %Plot
 videon = 0;
 ploton =0;
@@ -456,7 +456,7 @@ for y=1:nmonte
                 %
                 xconsallsensor{n,i}=sensors{kk,ll}.xcons;
             end
-            meanimmnocons(end+1)=rms(rmsimm);
+            meanimmcons(end+1)=rms(rmsimm);
         end
         
         
@@ -566,7 +566,7 @@ for y=1:nmonte
     rmssenserr(y)=rms(meanerrsensed);
     maxnsenserr(y)=maxerrsens;
     maxerrnocons(y)=maximm;
-    rmsnocons(y)=rms(meanimmnocons);
+    rmsnocons(y)=rms(meanimmcons);
 end
 
 
@@ -590,7 +590,7 @@ if plotresults==1
     xlabel('Timestep number [k]')
     
     figure(3)
-    plot(meanimmnocons)
+    plot(meanimmcons)
     title('RMS Individual IMM Errors Norm on Position')
     ylabel('|dx| [m]')
     xlabel('Timestep number [k]')
@@ -642,13 +642,13 @@ if plotresults==1
     ylabel('max(|dx|) [m]')
     xlabel('Iteration number [k]')
     figure(11)
-    plot(maxerrnocons)
-    title('Max of Individual IMM Errors Norm on Position at Iteration [k]')
+        plot(maxerrnocons)
+    title('Max of ON Sensors Error Norm on Position at Iteration [k]')
     ylabel('max(|dx|) [m]')
     xlabel('Iteration number [k]')
     figure(12)
-    plot(rmsnocons)
-    title('RMS of RMS Individual IMM Errors Norm on Position at Iteration [k]')
+        plot(rmsnocons)
+    title('RMS of RMS of Sensors Error Norm on Position at Iteration [k]')
     ylabel('max(|dx|) [m]')
     xlabel('Iteration number [k]')
 end
