@@ -11,9 +11,9 @@ delta=0.05;
 %at which rate do we do the consensus ?
 rate=5;
 %Maximum number of iteration
-nstop=100;
+nstop=1000;
 %iterations montecarlo
-nmonte=10;
+nmonte=100;
 %Plot
 videon = 0;
 ploton =0;
@@ -362,7 +362,6 @@ for y=1:nmonte
         end
         %compute IMM for all the sensors that are on
         rmsimm=[];
-        maximm=0;
         for i=1:lon
             %get indices from onindices cell array
             kk=onindices{i}(1);
@@ -386,7 +385,7 @@ for y=1:nmonte
             Hmu=[Hmu;eye(ns)];
             musens=[musens,sensors{kk,ll}.mu'];
             rmsimm(end+1)=norm(sensors{kk,ll}.xmix(1:2)-stato(1:2,n+1));
-            maximm=max(maximmnocons,rmsimm(i));
+            maximmnocons=max(maximmnocons,rmsimm(i));
             xksens=[xksens;sensors{kk,ll}.xpred];
             Pksens{i}(:,:,:)=sensors{kk,ll}.Ppred;
             muijsens=blkdiag(muijsens,sensors{kk,ll}.muij);
@@ -439,7 +438,7 @@ for y=1:nmonte
                 end
             end
             meanimmnocons(end+1)=norm(stato(1:2,n+1)-statocons(1:2,ncons+1));
-            maximm=max(maximmnocons,norm(stato(1:2,n+1)-statocons(1:2,ncons+1)));
+            maximmnocons=max(maximmnocons,norm(stato(1:2,n+1)-statocons(1:2,ncons+1)));
             ncons=ncons+1;
         else
             %addpoints(curve2,statocons(1,n-1),statocons(2,n-1));
@@ -565,7 +564,7 @@ for y=1:nmonte
     maxerr(y)=max(rmspos);
     rmssenserr(y)=rms(meanerrsensed);
     maxnsenserr(y)=maxerrsens;
-    maxerrnocons(y)=maximm;
+    maxerrnocons(y)=maximmnocons;
     rmsnocons(y)=rms(meanimmnocons);
 end
 
