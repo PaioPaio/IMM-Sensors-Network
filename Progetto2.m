@@ -11,9 +11,9 @@ delta=0.05;
 %at which rate do we do the consensus ?
 rate=5;
 %Maximum number of iteration
-nstop=500;
+nstop=100;
 %iterations montecarlo
-nmonte=20;
+nmonte=10;
 %Plot
 videon = 0;
 ploton =0;
@@ -286,8 +286,9 @@ for y=1:nmonte
     errsensed=cell(nstop,1);
     meanerrsensed=[];
     maxerrsens=0;
-    senprederr=cell(nstop,4,5);
-    meansenprederr=zeros(nstop,1);
+    meanimmnocons=[];
+    maximmnocons=0;
+    
     while (~(isempty(onindices))&&n<nstop)
         x=move(stato(:,n),acc,mode(n),Q,caso,delta,ABG);
         mode(n+1)=markchange(s,Transmat);
@@ -360,6 +361,8 @@ for y=1:nmonte
             end
         end
         %compute IMM for all the sensors that are on
+        rmsimm=[];
+        maximm=0;
         for i=1:lon
             %get indices from onindices cell array
             kk=onindices{i}(1);
@@ -383,7 +386,8 @@ for y=1:nmonte
             Hsens=[Hsens;eye(nx)];
             Hmu=[Hmu;eye(ns)];
             musens=[musens,sensors{kk,ll}.mu'];
-            
+            rmsimm(end+1)=norm(sensors{kk,ll}.xmix(1:2)-stato(1:2,n+1));
+            maximm=max(maximmnocons,rmsimm(i));
             xksens=[xksens;sensors{kk,ll}.xpred];
             Pksens{i}(:,:,:)=sensors{kk,ll}.Ppred;
             muijsens=blkdiag(muijsens,sensors{kk,ll}.muij);
@@ -439,6 +443,8 @@ for y=1:nmonte
                     [sensors{kk,ll}.xconskalm(:,i),sensors{kk,ll}.Pconskalm(:,:,i)]=WLS(xksens(:,i),Pkksens,Hsens);
                 end
             end
+            meanimmnocons(end+1)=norm(stato(1:2,n+1)-statocons(1:2,ncons+1));
+            maximm=max(maximmnocons,norm(stato(1:2,n+1)-statocons(1:2,ncons+1)));
             ncons=ncons+1;
         else
             %addpoints(curve2,statocons(1,n-1),statocons(2,n-1));
@@ -456,6 +462,7 @@ for y=1:nmonte
                 xconsallsensor{n,i}=sensors{kk,ll}.xcons;
                 
             end
+            meanimmnocons(end+1)=rms(rmsimm);
         end
         
         
@@ -564,8 +571,8 @@ for y=1:nmonte
     maxerr(y)=max(rmspos);
     rmssenserr(y)=rms(meanerrsensed);
     maxnsenserr(y)=maxerrsens;
-    rmssenprederr(y)=rms(meansenprederr) ;
-    maxsenprederr(y)=max(meansenprederr) ;
+    maxerrnocons(y)=maximm;
+    rmsnocons(y)=rms(meanimmnocons);
 end
 
 
@@ -589,8 +596,14 @@ if plotresults==1
     xlabel('Timestep number [k]')
     
     figure(3)
+    plot(meanimmnocons)
+    title('RMS Individual IMM Errors Norm on Position')
+    ylabel('|dx| [m]')
+    xlabel('Timestep number [k]')
+    
+    figure(4)
     plot(rmspos)
-    title('IMM Error Norm on Position')
+    title('Consensus IMM Error Norm on Position')
     ylabel('|dx| [m]')
     xlabel('Consensus number [k]')
     
@@ -605,29 +618,29 @@ if plotresults==1
         case 1
             figure(5)
             plot(rmsvel);
-            title('IMM Error Norm on Speed')
+            title('Consensus IMM Error Norm on Speed')
             ylabel('|dv| [m/s]')
             xlabel('Consensus number [k]')
         case 2
             figure(5)
             plot(rmsvel);
-            title('IMM Error Norm on Tangential Speed')
+            title('Consensus IMM Error Norm on Tangential Speed')
             ylabel('|dv| [m/s]')
             xlabel('Consensus number [k]')
             figure(6)
             plot(rmsang);
-            title('IMM Error Norm on Yaw Angle')
+            title('Consensus IMM Error Norm on Yaw Angle')
             ylabel('|d\alpha| [rad]')
             xlabel('Consensus number [k]')
     end
     figure(7)
     plot(rmserr);
-    title('RMS of IMM Position Errors at Iteration [k]')
+    title('RMS of Consensus IMM Position Errors at Iteration [k]')
     ylabel('rms(dx) [m]')
     xlabel('Iteration [k]')
     figure(8)
     plot(maxerr);
-    title('Max of IMM Position Errors at Iteration [k]')
+    title('Max of Consensus IMM Position Errors at Iteration [k]')
     ylabel('max(dx) [m]')
     xlabel('Iteration [k]')
     figure(9)
@@ -640,19 +653,16 @@ if plotresults==1
     title('Max of ON Sensors Error Norm on Position at Iteration [k]')
     ylabel('max(|dx|) [m]')
     xlabel('Iteration number [k]')
-    
     figure(11)
-    plot(rmssenprederr)
-    title('RMs of RMS of IMM Prediction Error Norm on Position at Iteration [k]')
+    plot(maxerrnocons)
+    title('Max of Individual IMM Errors Norm on Position at Iteration [k]')
     ylabel('max(|dx|) [m]')
     xlabel('Iteration number [k]')
-    
     figure(12)
-    plot(maxsenprederr)
-    title('Max of RMS of IMM Prediction Error Norm on Position at Iteration [k]')
+    plot(rmsnocons)
+    title('RMS of RMS Individual IMM Errors Norm on Position at Iteration [k]')
     ylabel('max(|dx|) [m]')
     xlabel('Iteration number [k]')
-
 end
 mediamedie=mean(rmserr)
 mediamax=mean(maxerr)
@@ -660,6 +670,9 @@ maxmax=max(maxerr)
 mediasens=mean(rmssenserr)
 mediamaxsens=mean(maxnsenserr)
 maxsens=max(maxnsenserr)
+maxmaxnocons=max(maxerrnocons)
+maxmedianocons=max(rmsnocons)
+mediamedienocons=rms(rmsnocons)
 
 
 
