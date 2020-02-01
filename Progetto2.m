@@ -9,7 +9,7 @@ caso=1;
 %delta time
 delta=0.05;
 %at which rate do we do the consensus ?
-rate=5;
+rate=2;
 %Maximum number of iteration
 nstop=1000;
 %iterations montecarlo
@@ -116,7 +116,7 @@ s=1;
 
 %Senosors
 range=10;
-R=diag([0.1,(2*pi/180)^2]);               %sensor covariance
+R=diag([0.01,(2*pi/360)^2]);               %sensor covariance
 
 rmserr=[];
 maxerr=[];
@@ -407,7 +407,9 @@ for y=1:nmonte
             % the first consensus at x0 and P0 with at n=1 out of the loop, so
             % the next consensi should happen at n+1=1+rate*k or rem(n,rate)==0
             [statocons(:,ncons+1),Pcons(:,:,ncons+1)]=WLS(xsens,Psens,Hsens);
-            mucons(:,ncons+1)=mean(musens,2);
+            if rate>3
+                mucons(:,ncons+1)=mean(musens,2);
+            end
             %check when do we have to do consensus
             if ploton==1
                 addpoints(curve2,statocons(1,ncons+1),statocons(2,ncons+1)) ; % addpoints(curve2,statocons(1,(n+1)/rate+1),statocons(2,(n+1)/rate+1))

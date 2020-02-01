@@ -9,6 +9,7 @@
 \usepackage{bookmark}
 \usepackage{natbib}
 \usepackage{geometry}
+\usepackage{bbm}
 %\usepackage{multicol}
 \usepackage{fancyhdr}
 \usepackage[document]{ragged2e}
@@ -29,7 +30,7 @@
  top=20mm,
  }
 
-\title{Imm algorithm implementation for tracking}
+\title{Report and analysis on implementation of IMM algorithm for multiple-model dynamics tracking}
 \author{
 Paiola Lorenzo 198573 
 
@@ -49,19 +50,16 @@ Zanolli Erik 198852}
 \section*{Introduction}
 \justify
 The purpouse of this project is to analyze and evaluate the performance of an IMM algorithm's implementation in a distributed environment for
-agent's tracking. The agent switches between linked models of movement by the means of a Markov chain. The goal is evaluate the best trade-off
-between error on estimated position and real position and number of messagesses involved in the tracking.
+multiple-model dynamics tracking as the tracked agent switches between linked models of movement by the means of a Markov chain. The goal 
+is to evaluate the best trade-off between error on estimated position and real position and number of messages regarding consensus involved in the tracking.
 
 
     \section*{Setting}
     \justify
-    NON CAPISCO COSA VUOI DIRE, IN QUALSIASI CASO QUA AGGIUNGI CHE PARLIAMO DI FILTRI DA DISCRETE-DISCRETE
+    The general objective of this report is to provide a robust tracking that works in a distributed way, for some object that can move 
+    in a number of different ways (modelized as a set of dynamical systems $\mathbbm{M}$). The environment in which this object moves is 
+    one of a large room that contains multiple sensors that can talk to each other.
     \\
-    Tracking an object with a switching dynamic require proper algorithms and filters.Retriving physical data with
-    observations it's not enough in the case of Markov processes that switch between modes and we need to
-    , models achiving the best-fit to our data is needed in order to make a prediction and estimate
-    with reduced uncertainty. Here comes to play a major role the IMM algorithm (Interacting Multiple Models): The data
-    from sensor are combined with different dynamical models through the algorithm...
     \subsection*{Sensor's model}
     The sensors chosen are radars measuring the relative polar cordinates at which the agent is collocated at the timestep, and
     are disposed as a uniform grid. In order to simulate the real workings of a sensor, range of measuremnt has been limited to the distance
