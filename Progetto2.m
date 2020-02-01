@@ -116,7 +116,7 @@ s=1;
 
 %Senosors
 range=10;
-R=diag([0.01,(2*pi/360)^2]);               %sensor covariance
+R=diag([0.1,(2*pi/180)^2]);               %sensor covariance
 
 rmserr=[];
 maxerr=[];
@@ -488,7 +488,7 @@ for y=1:nmonte
             
             addpoints(curve1,stato(1,n),stato(2,n))
             drawnow
-            if plotallsenson==1g
+            if plotallsenson==1
                 if lon>=1
                     addpoints(curvesens1,xconsallsensor{n,1}(1),xconsallsensor{n,1}(2));
                     drawnow

@@ -1,0 +1,404 @@
+\documentclass[twocolumn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath} % Advanced math typesetting
+\usepackage[utf8]{inputenc} % Unicode support (Umlauts etc.)
+\usepackage[english]{babel} % Change hyphenation rules
+\usepackage{hyperref} % Add a link to your document
+\usepackage{graphicx} % Add pictures to your document
+\usepackage{listings} % Source code formatting and highlighting
+\usepackage{bookmark}
+\usepackage{natbib}
+\usepackage{geometry}
+\usepackage{bbm}
+%\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage[document]{ragged2e}
+\usepackage{adjustbox}
+\usepackage{subcaption}
+% \pagestyle{fancy}
+% \fancyhf{}
+% \fancyhead[LE,RO]{Overleaf}
+% \fancyhead[RE,LO]{Guides and tutorials}
+% \fancyfoot[CE,CO]{\leftmark}
+% \fancyfoot[LE,RO]{\thepage}
+\graphicspath{ {Immagini/} }
+%C:\Users\erikz\OneDrive\Desktop\PaioPaio2\IMM-Sensors-Network\Latex\Immagini
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+
+\title{Report and analysis on implementation of IMM algorithm for multiple-model dynamics tracking}
+\author{
+Paiola Lorenzo 198573 
+
+Zanolli Erik 198852}
+\date{January 2020}
+
+
+
+
+
+\begin{document}
+
+\maketitle
+
+
+
+\section*{Introduction}
+\justify
+The purpouse of this project is to analyze and evaluate the performance of an IMM algorithm's implementation in a distributed environment for
+multiple-model dynamics tracking as the tracked agent switches between linked models of movement by the means of a Markov chain. The goal 
+is to evaluate the best trade-off between error on estimated position and real position and number of messages regarding consensus involved in the tracking.
+
+
+    \section*{Setting}
+    \justify
+    The general objective of this report is to provide a robust tracking that works in a distributed manner for some object that can move 
+    in a number of different ways (modelized as a set of dynamical systems $\mathbbm{M}$). The environment in which this object moves is 
+    one of a large room that contains multiple sensors that can talk to each other.
+    \\
+    \subsection*{Sensor's model}
+    The sensors chosen are radars measuring the polar cordinates relative to themselves at which the agent is collocated at the timestep, and
+    are disposed in a uniform square grid. In order to simulate the real workings of a sensor, range of measuremnt has been limited to the distance
+    between one sensor and the following one in any direction of the grid, as soon as the agent exceed the imposed maxiumum distance from the sensor,
+    the device will stop sensing.
+    This property of the sensor grid, coupled by its geometry, ensures that no more than 4 sensors can measure the agent position at any time,
+    so it made sense to let the sensors switch between 3 different states named ON, OFF and IDLE. This can be justified as a way to make the system
+    more power efficient and to avoid useless data stream towards sensors that aren't currently in range and sensing.
+    The sensor is modeled as a state machine as shown in figure \ref{fig:statemachine}
+    \\
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=\columnwidth]{sensor_state_machine.png}
+        \caption{State machine sensor}
+        \label{fig:statemachine}
+    \end{figure}
+    \\
+Sensors in different states differ between each other by the actions that are allowed in the state they are currently in.
+\\
+Here we enumerate such allowed actions:
+\begin{itemize}
+    \item ON: at each time-step checks if it is still in range with the function inRange(), takes a measurement, computes the IMM algorithm and 
+             at a tunable rate computes the consensus with the other nearby ON sensors. If it's not in range anymore then turns IDLE.
+    \item IDLE : checks if it is now in range with the function inRange(), if it is then initialize itself with the data from nearby sensors 
+                that are ON. If it recieves a CantSense signal, it checks if at least one of its neighboors is still ON, else it turns OFF itself.
+    \item OFF : does nothing but waits for a CanSense signal sent by a neighboor and turns IDLE in the case it has received one (this means that 
+                a nearby sensor has turned ON).
+\end{itemize}
+    So sensors can communicate with the devices adjacent to them (Neighboorhood), as represented in the figure \ref{fig:neighboors} below, 
+    and exchange with them signals named CanSense and CantSense which state respectively whenever the agent gets in or goes out of the 
+    communicating sensor's range. This check is done through the function inRange() that also serves as a switch between the states of the 
+    sensor, as already shown by the figure \ref{fig:statemachine} above.
+    The messages that the sensors exchange with their Neighboorhood are
+\begin{itemize} 
+    \item CanSense : message sent by a sensor switching from IDLE to ON triggered by a positive result from InRange() function
+    \item CantSense : message sent by a sensor switching from ON to IDLE triggered by a negative result from InRange() function
+\end{itemize}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.2\textwidth]{Immagini/2sensor.png}
+        \caption{The neighboors of a sensors are the one immediately adiacent, represented as purple in this image}
+        \label{fig:neighboors}
+    \end{figure}
+    By defing the range of the sensors equal to their spacing on the grid it follows that only a maximum of 4 sensors can be turned on. 
+    This fact is shown in the following picture that illustrates the different cases
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.23\textwidth]{Immagini/4sensor.png}
+        \caption{}
+        \label{fig:number}
+    \end{figure}
+    \begin{itemize}
+        \item blue : 1 sensors ON, happens only at the conrners of the grid
+        \item yellow : 2 sensors ON 
+        \item orange : 3 sensors ON 
+        \item red : 4 sensors ON 
+    \end{itemize}
+    Whenever the target is in range of a sensor at given timestep, the device takes a measurement.
+    The model choosen for our sensor is a Radar, and as such the non-linear measurement function
+     associated to it is the cartesian to polar transformation at timestep $k$, as shown below
+    \begin{align*}
+        &z(k)=h(x(k))+v(k)\\
+        &\begin{bmatrix}
+            \rho(k)\\ \theta (k)(k)
+        \end{bmatrix}=  
+        \begin{bmatrix}
+            \sqrt{x_{1}(k)^2+x_{2}(k)^2}\\ atan2(x_{2}(1)/x_{1}(k))
+        \end{bmatrix} +
+        \begin{bmatrix}
+            v_{1}(k)\\v_{2}(k)
+        \end{bmatrix}
+    \end{align*}
+    where $h(x)$ is the polar to cartesian cordinates transform that takes in $x(k)$ that is the state (of which the first 2 elements are the cartesian
+    cordinates relative to the sensor), $z(k)$ is the measure and $v(k)$ is the noise associated to the measurement's operation. The measurement noise $w(k)$ is associated 
+    to a diagonal power spectral density matrix $R$.
+    \begin{equation*}
+        R=\begin{bmatrix}
+            \sigma^{2}_{\rho}&0\\
+            0&\sigma^{2}_{\theta (k)}
+        \end{bmatrix}
+    \end{equation*}
+    \\
+   The matrix $H^{k}=(\nabla_{x} h(x))_{|x=x(k)}$ used in the linearized model with $v(k)=0$, necessary in the IMM filter at each timestep $k$,
+   computes to 
+    \begin{equation*}
+        H^{k}= \begin{bmatrix}
+            \frac{x_{1}}{\sqrt{x_{1}^{2}+x_{2}^{2}}} & \frac{x_{2}}{\sqrt{x_{1}^{2}+x_{2}^{2}}}& 0 \dots\\
+            \frac{-x_{2}}{x_{1}^{2}+x_{2}^{2}}  & \frac{x_{1}}{x_{1}^{2}+x_{2}^{2}}& 0 \dots\\
+        \end{bmatrix}_{|x(k)}
+    \end{equation*}
+    Where $0\dots$ is a vector of zeroes for all the other states that do not influence the measurement function.
+  
+    \section*{Model used}
+    As mentioned already, the agent we want to track has a variable-model dynamic that can switch between different elements in a set 
+    of models that we denote as $\mathbbm{M}$. We will consider 2 families of such sets that we will call: Random Accellerated Walk $\mathbbm{M}_{1}$ 
+    and Random Unicycle Turning $\mathbbm{M}_{2}$. Every element of said families is a discrete Markovian process, as all are influenced by a white 
+    noise on their inputs.
+    \subsection*{Random Accellerated Walk}
+    For the Random Accellerated Walk we consider the set $\mathbbm{M}_{1}$ to be 5 elements large. 
+    Here the elements are described
+    \begin{center}
+        \begin{tabular}{||c||c |c |}%{|width=\columnwidth|}
+            \hline
+             Random Walk  \\
+            \hline\hline
+             Mode & Behaviour  \\ [0.5ex]
+            \hline\hline
+            Mode 1 & Constant Speed \\
+            \hline
+            Mode 2  & Positive Acceleration in x  \\
+            \hline
+            Mode 3  & Negative Acceleration in x  \\
+            \hline
+            Mode 4  & Positive Acceleration in y  \\
+            \hline
+            Mode 5  & Negative Acceleration in y   \\ [1ex]
+            \hline
+        \end{tabular}
+    \end{center}
+
+    Every member of the set has the same structure 
+    to describe their dynamics, in state space this their shared linear model
+    \begin{equation}
+        x(k+1)= Ax(k) + B(s)u + Gw(k)
+    \end{equation}
+    where $A$ is the state matrix, $B(s)$ the input matrix function of the mode/index $s$ that indicates the element picked of $\mathbbm{M}_{1}$, 
+    $u$ is the input that stays constant at all timesteps $k$ and in all modes $s$, $G$ the noise matrix and $w(k)$ the process noise at timestep
+     $k$ with associated $Q_{1}$ diagonal power spectral density matrix.
+     \begin{equation*}
+        Q_{1}=\begin{bmatrix}
+            \sigma^{2}_{a_{x}}&0\\
+            0&\sigma^{2}_{a_{y}}
+        \end{bmatrix}
+    \end{equation*}
+     Below we show the constant matrices and how the state is structured
+    \[ x=\begin{bmatrix} x \\ y \\ \dot{x} \\ \dot{y} \\ \end{bmatrix}  A=\begin{bmatrix}
+        1 & 0 & \delta & 0      \\
+        0 & 1 & 0      & \delta \\
+        0 & 0 & 1      & 0      \\
+        0 & 0 & 0      & 1      \\
+    \end{bmatrix}
+    G=\begin{bmatrix}
+        \frac{\delta^{2}}{2} & 0          \\
+        0          & \frac{\delta^{2}}{2} \\
+        \delta     & 0          \\
+        0          & \delta     \\
+    \end{bmatrix}
+\]
+Where $x$ and $y$ are the cartesian coordinates in the absolute reference frame and $\delta$ is the duration of each timestep $k$.
+To model different behaviours of the agent/elements in the set $\mathbbm{M}_{1}$ we use switching matrices $B(s)$ while keeping the vector $u$ 
+constant. The input $u$ here is a vector of acceleration in $x$ and $y$ that the noise $w(k)$ will influence.
+We hypothesize that the input is always known in magnitude and constant. Here is the set $B(s)$ of input matrices.
+    \begin{equation*}%[width=\columnwidth]
+        \resizebox{.9 \columnwidth}{!}{
+        $B(s)=\begin{Bmatrix}
+            \begin{bmatrix}
+                0 & 0 \\
+                0          & 0 \\
+                0     & 0 \\
+                0          & 0 \\
+            \end{bmatrix}
+            \begin{bmatrix}
+                \frac{\delta^{2}}{2} & 0 \\
+                0          & 0 \\
+                \delta     & 0 \\
+                0          & 0 \\
+            \end{bmatrix}
+            \begin{bmatrix}
+                -\frac{\delta^{2}}{2} & 0 \\
+                0          & 0 \\
+                -\delta     & 0 \\
+                0          & 0 \\
+            \end{bmatrix}
+            \begin{bmatrix}
+                0 & 0          \\
+                0 & \frac{\delta^{2}}{2} \\
+                0 & 0          \\
+                0 & \delta     \\
+            \end{bmatrix}
+            \begin{bmatrix}
+                0 & 0          \\
+                0 & -\frac{\delta^{2}}{2} \\
+                0 & 0          \\
+                0 & -\delta     \\
+            \end{bmatrix}
+        \end{Bmatrix} $ 
+        }
+    \end{equation*}
+    \\
+    It is to note that the matrix $G$ is a merge between the second and the fourth matrices found in the set $B(s)$ as we hyphotesized that 
+     the noise will act randomly in direction and magnitude at every time-step.
+\\
+The jump between behaviours is modeled by a Markov chain that has a constant stochastic transition matrix $T$.
+In the simulations the matrix is fixed at
+\begin{equation*}
+    T=\begin{bmatrix}
+        p_{0}&p&p&p&p\\
+        b&q_{0}&2q&q&2q\\
+        b&2q&q_{0}&2q&q\\
+        b&q&2q&q_{0}&2q\\
+        b&2q&q&2q&q_{0}\\
+    \end{bmatrix}
+\end{equation*}
+Where $p_{0}$, $q_{0}$ and $b$ are fixed while $p$ and $q$ are computed so that the matrix is stochastic.
+\subsection*{Random Unicycle Turning}
+In the case of the Random Unicycle Turning we also consider the set $\mathbbm{M}_{2}$ to be 5 elements large, but the states are changed.
+    \begin{center}
+        \begin{tabular}{||c||c |c |}%{|width=\columnwidth|}
+            \hline
+             Unycicle  \\
+            \hline\hline
+            Mode & Behaviour  \\ [0.5ex]
+            \hline\hline
+            Mode 1 & Constant Tangential Velocity and Angle \\
+            \hline
+            Mode 2  & Positive Angular Wheel Acceleration  \\
+            \hline
+            Mode 3  & Negative Angular Wheel Acceleration \\
+            \hline
+            Mode 4  & Positive Yaw Rate  \\
+            \hline
+            Mode 5  & Negative Yaw Rate   \\ [1ex]
+            \hline
+        \end{tabular}
+    \end{center}
+Here all the elements in the set $\mathbbm{M}_{2}$ are non-linear models $x(k+1)=f(x(k),u(k),w(k),s)$, but if we can still organize them in such a way
+    \begin{equation}
+        x(k+1)= A(x(k))x(k) + B(s,x(k))u(k) + G(x(k))w(k)
+    \end{equation}
+By defining
+    \begin{equation*}      
+     \resizebox{.99\columnwidth}{!}{ $ x=\begin{bmatrix} x(k) \\ y(k) \\ v_{t}(k) \\ \alpha(k) \\ \end{bmatrix}  
+        A(x(k))=\begin{bmatrix}
+            1 & 0 & \delta cos(\dot{\alpha (k)}) & 0      \\
+            0 & 1 & 0      & \delta sin(\dot{\alpha (k)}) \\
+            0 & 0 & 1      & 0      \\
+            0 & 0 & 0      & 1      \\
+        \end{bmatrix}
+         G(x(k))=\begin{bmatrix}
+            \frac{\delta^{2}}{2} cos(\alpha (k))r & 0  \\
+            \frac{\delta^{2}}{2} sin(\alpha (k))r & 0 \\
+            \delta r    & 0          \\
+            0 & \delta     \\
+        \end{bmatrix}
+    $ } \end{equation*}
+and 
+\begin{equation*}%[width=\columnwidth]
+    \resizebox{.99 \columnwidth}{!}{
+    $B(s,k)=\begin{Bmatrix}
+        \begin{bmatrix}
+            0 & 0 \\
+            0          & 0 \\
+            0     & 0 \\
+            0          & 0 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            \frac{\delta^{2}}{2} cos(\alpha (k))r & 0 \\
+            \frac{\delta^{2}}{2} sin(\alpha (k))r & 0 \\
+            \delta r    & 0 \\
+            0          & 0 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            -\frac{\delta^{2}}{2} cos(\alpha (k))r & 0 \\
+            -\frac{\delta^{2}}{2} sin(\alpha (k))r & 0 \\
+            -\delta r    & 0 \\
+            0          & 0 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 0          \\
+            0 & 0 \\
+            0 & 0          \\
+            0 & \delta     \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 0          \\
+            0 & 0 \\
+            0 & 0          \\
+            0 & -\delta     \\
+        \end{bmatrix}
+    \end{Bmatrix} $ 
+    }
+\end{equation*}
+where $\delta$ is the length of the timestep $k$, $r$ the radius of the unicycle's wheel, $x(k)$ and $y(k)$ absolute cartesian cordinates of the unicycle, 
+$v_{t}(k)$ tangential velocity and $\alpha$ yaw angle.
+The input $u$ is a vector of the angular acceleration of the wheel $\omega$ and yaw rate $\Omega$ with
+\begin{equation*}
+    Q_{2}=\begin{bmatrix}
+        \sigma^{2}_{\omega}&0\\
+        0&\sigma^{2}_{\Omega}
+    \end{bmatrix}
+\end{equation*}
+Just as in $\mathbbm{M}_{1}$, $G$ is build on the hypothesis that the process noise $w(k)$ influences both inputs at any timestep $k$.
+\\
+The stochastic transition matrix in this case will be 
+\begin{equation*}
+    T=\begin{bmatrix}
+        p_{0}&p&p&p&p\\
+        q&q_{0}&q&0&0\\
+        q&q&q_{0}&0&0\\
+        q&0&0&q_{0}&q\\
+        q&0&0&q&q_{0}
+    \end{bmatrix}
+\end{equation*}
+where $p_{0}$ and $q_{0}$ are fixed while $p$ and $q$ are computed to make the matrix stochastic.
+\section*{IMM}
+    In order to reach a more accurate prediction of the trajectory a IMM algorithm is implemented in the sensors's grid. The working principles 
+    involves a general knowledge or hypothesis of the model of agent's movement. Every model is used in a Kalman filter stage that use the same measurement and make
+    a prediction: the one with the smaller uncertainty is choose as the model for our agent at that timestep. A general scheme of the working principles is shown here (image?)
+    \\
+
+    \section*{Consensus}
+    The set of active sensors inside the grid is dynamic, as vertices keep getting added and popped. However it has to be noticed, as stated before, that no 
+     more than 4 sensors will be ON at any point of time and they will all be adjacent to each other, this let us model the graph of the active 
+     sensors as fully-connected, since the distance between them is short and they are directly linked.
+    \\
+    \section*{Result}
+    The performance evaluation of the system are evaluted by computing the RMS of the predicted trajectory eith the respect to the actual one
+    choosing different rate of performind the WSL. The final result are listed in the table below
+
+
+    \begin{center}
+        \begin{tabular}{||c c c c||}
+            \hline
+            1 step & 2 step & 3 step & 4 step \\ [0.5ex]
+            \hline\hline
+            1      & 6      & 87837  & 787    \\
+            \hline
+            2      & 7      & 78     & 5415   \\
+            \hline
+            3      & 545    & 778    & 7507   \\
+            \hline
+            4      & 545    & 18744  & 7560   \\
+            \hline
+            5      & 88     & 788    & 6344   \\ [1ex]
+            \hline
+        \end{tabular}
+    \end{center}
+
+
+    \subsection*{}
+
+\end{document}
