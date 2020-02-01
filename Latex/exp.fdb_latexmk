@@ -1,11 +1,11 @@
 # Fdb version 3
-["pdflatex"] 1580567567 "exp.tex" "c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/exp.pdf" "exp" 1580567568
+["pdflatex"] 1580588172 "exp.tex" "c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/exp.pdf" "exp" 1580588173
   "Immagini/2sensor.png" 1580496997 9753 2bdf425ba28cb878c6388de89d3b8ded ""
   "Immagini/4sensor.png" 1580496997 20589 84fdbe00fca5602362259109fceac589 ""
-  "Immagini/Sensor_state_machine.png" 1580496997 27823 0a59d192494f71a7d1df4acc95d06a42 ""
-  "Immagini/sensor_state_machine.png" 1580496997 27823 0a59d192494f71a7d1df4acc95d06a42 ""
+  "Immagini/Sensor_state_machine.png" 1580568578 27925 962786d084337ccc8cde8601c7623a99 ""
+  "Immagini/sensor_state_machine.png" 1580568578 27925 962786d084337ccc8cde8601c7623a99 ""
   "c:/Users/Lorenzo/.texlive2019/texmf-var/fonts/pk/ljfour/public/bbm/bbm10.600pk" 1578564184 6964 6ef4b6d3a35befaec84204b261d8dc29 ""
-  "c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/exp.aux" 1580567568 1670 052136c9162c6a422ebd9fa90b968d86 ""
+  "c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/exp.aux" 1580588173 1642 f1992a927813daf896fdcbad380755b3 ""
   "c:/texlive/2019/texmf-dist/fonts/map/fontname/texfonts.map" 1576870611 3332 103109f5612ad95229751940c61aada0 ""
   "c:/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1576869562 1004 54797486969f23fa377b128694d548df ""
   "c:/texlive/2019/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1576869562 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -121,11 +121,11 @@
   "c:/texlive/2019/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1576872929 4736858 25e05f73c90978621ac32e57c278d56c ""
   "c:/texlive/2019/texmf-var/web2c/pdftex/pdflatex.fmt" 1576873061 4290738 f5ac711ddf2de70b063ff3eaa0183023 ""
   "c:/texlive/2019/texmf.cnf" 1576872909 673 4ae7b2f49cee444c5343a45b5d0f169c ""
-  "exp.aux" 1580567568 1670 052136c9162c6a422ebd9fa90b968d86 "pdflatex"
-  "exp.tex" 1580567565 20487 5ba0a39a51e1b4c2826d6e5fac376933 ""
+  "exp.aux" 1580588173 1642 f1992a927813daf896fdcbad380755b3 "pdflatex"
+  "exp.tex" 1580588171 18516 32bb55a17d1134a4c7c771966b97ccb8 ""
   (generated)
+  "exp.aux"
   "c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/exp.pdf"
   "c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/exp.log"
   "exp.log"
-  "exp.aux"
   "exp.pdf"

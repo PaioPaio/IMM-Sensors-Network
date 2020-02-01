@@ -56,231 +56,162 @@ is to evaluate the best trade-off between error on estimated position and real p
 
     \section*{Setting}
     \justify
-    The general objective of this report is to provide a robust tracking that works in a distributed way, for some object that can move 
+    The general objective of this report is to provide a robust tracking that works in a distributed manner for some object that can move 
     in a number of different ways (modelized as a set of dynamical systems $\mathbbm{M}$). The environment in which this object moves is 
     one of a large room that contains multiple sensors that can talk to each other.
     \\
     \subsection*{Sensor's model}
-    The sensors chosen are radars measuring the relative polar cordinates at which the agent is collocated at the timestep, and
-    are disposed as a uniform grid. In order to simulate the real workings of a sensor, range of measuremnt has been limited to the distance
+    The sensors chosen are radars measuring the polar cordinates relative to themselves at which the agent is collocated at the timestep, and
+    are disposed in a uniform square grid. In order to simulate the real workings of a sensor, range of measuremnt has been limited to the distance
     between one sensor and the following one in any direction of the grid, as soon as the agent exceed the imposed maxiumum distance from the sensor,
     the device will stop sensing.
-    This property of the sensor grid, coupled by its geometry, ensures that no more than 4 sensors can measure the agent position at the time,
-    so it made sense to let sensor switch between 3 different states named ON, OFF and IDLE. This can be justified as a way to make the system
+    This property of the sensor grid, coupled by its geometry, ensures that no more than 4 sensors can measure the agent position at any time,
+    so it made sense to let the sensors switch between 3 different states named ON, OFF and IDLE. This can be justified as a way to make the system
     more power efficient and to avoid useless data stream towards sensors that aren't currently in range and sensing.
-    The sensor is modeled as a state machine as shown.
+    The sensor is modeled as a state machine as shown in figure \ref{fig:statemachine}
     \\
     \begin{figure}[h!]
         \centering
         \includegraphics[width=\columnwidth]{sensor_state_machine.png}
         \caption{State machine sensor}
-        \label{fig:galaxy}
+        \label{fig:statemachine}
     \end{figure}
     \\
-The functions and operations that the sensors can do are:
+Sensors in different states differ between each other by the actions that are allowed in the state they are currently in.
+\\
+Here we enumerate such allowed actions:
 \begin{itemize}
-    \item InRange() : function that verify the presence of the target in its working area 
-    \item CanSense : messagge sent by a sensor switching from Idle to On triggered by a positive result from InRange() function
-    \item CantSense : message sent by a sensor switching from On to Idle triggered by a negative result from InRange() function
-    \end{itemize}
-    Every sensor accordingly with its state can perform some action and send information following the rules listed below:
-\begin{itemize}
-    \item On: participate in the measurement process while InRange() stay with positive result. 
-    It retrieve data on position and perform a IMM algorithm and with a selected rate perform a linear consensus calculation 
-    \item Idle : perform a InRange() verification each timestep to verify if it have to switch in On. If triggered to On 
-    initialization starts using data from the others sensors as a starting point.
-    if it receive a CantSense from all the neighboors it turn itself off.
-    \item Off : no measurment function or involvement. Triggered to Idle when receive one CanSense by the neighboors
-    \end{itemize}
-
-    % \begin{center}
-    %     \begin{adjustbox}{max width=0.45\textwidth}
-    %     \begin{tabular}{||c| c| c |c||}
-    %         \hline
-    %           & On & 3 Idle & Off \\ [0.5ex]
-    %         \hline\hline
-    %         InRange()==      & True      & False  & False    \\
-    %         \hline
-    %         Message sent      & CanSense      & CantSense     & X   \\
-    %         \hline
-    %         Functions      & measurement    & ready to switch to On    & X   \\
-    %         \hline
-           
-    %         \hline
-    %     \end{tabular}
-    % \end{adjustbox}
-    % \end{center}
-    So sensors can communicate with the devices adjacent to them (Neighboorhood), as represented in the figure below, and exchange with them signals named CanSense and CantSense
-    which state respectively whenever the agent gets in or goes out of the communicating sensor's range. This check is done through the 
-    function inRange() that also serves as a switch between the states of the sensor, as already shown by the figure above.
-    \\
+    \item ON: at each time-step checks if it is still in range with the function inRange(), takes a measurement, computes the IMM algorithm and 
+             at a tunable rate computes the consensus with the other nearby ON sensors. If it's not in range anymore then turns IDLE.
+    \item IDLE : checks if it is now in range with the function inRange(), if it is then initialize itself with the data from nearby sensors 
+                that are ON. If it recieves a CantSense signal, it checks if at least one of its neighboors is still ON, else it turns OFF itself.
+    \item OFF : does nothing but waits for a CanSense signal sent by a neighboor and turns IDLE in the case it has received one (this means that 
+                a nearby sensor has turned ON).
+\end{itemize}
+    So sensors can communicate with the devices adjacent to them (Neighboorhood), as represented in the figure \ref{fig:neighboors} below, 
+    and exchange with them signals named CanSense and CantSense which state respectively whenever the agent gets in or goes out of the 
+    communicating sensor's range. This check is done through the function inRange() that also serves as a switch between the states of the 
+    sensor, as already shown by the figure \ref{fig:statemachine} above.
+    The messages that the sensors exchange with their Neighboorhood are
+\begin{itemize} 
+    \item CanSense : message sent by a sensor switching from IDLE to ON triggered by a positive result from InRange() function
+    \item CantSense : message sent by a sensor switching from ON to IDLE triggered by a negative result from InRange() function
+\end{itemize}
     \begin{figure}[h!]
         \centering
         \includegraphics[width=0.2\textwidth]{Immagini/2sensor.png}
-        \caption{Neighboors for a sensors are the one immediately adiacent. The purples ones represent the neighboors of green sensor}
-        \label{fig:galaxy}
+        \caption{The neighboors of a sensors are the one immediately adiacent, represented as purple in this image}
+        \label{fig:neighboors}
     \end{figure}
-    \\
-    Defing the range of the sensors equal to their spacing on the grid it follows, depending on agent's position, only a maximum of 4 sensors can be turned on. 
-    It follows a figure that show the idea with a 4-sensors grid
+    By defing the range of the sensors equal to their spacing on the grid it follows that only a maximum of 4 sensors can be turned on. 
+    This fact is shown in the following picture that illustrates the different cases
     \begin{figure}[h!]
         \centering
         \includegraphics[width=0.23\textwidth]{Immagini/4sensor.png}
         \caption{}
-        \label{fig:galaxy}
+        \label{fig:number}
     \end{figure}
     \begin{itemize}
-        \item blue : 1 sensors On 
-        \item yellow : 2 sensors On 
-        \item orange : 3 sensors On 
-        \item red : 4 sensors On 
-        \end{itemize}
-    % Different state can receive and send different messagesses. A sensor in On state has the moving
-    % object in his range and send a CanSense to the nearby and when trackin moving away from the operating range send a CantSense turning itself to Idle.
-    % Sensors that receive a CanSense and are not already On turn in Idle state; during the Idle state sensors check
-    % if object appears in range sensors turn to On and send a CanSense, if nothing trigger the range it send to the nearby a CantSense signal.
-    % A sensor that is in Idle and during the information exchange receive only CantSense from the nearby turn itself Off and stop to check if somenthing is in range and
-    % can be turned again to Idle via a CanSense. This scheme implies that a sensors can never switch to On from Off except for the initialization step.
-    % \\
-    Whenever the target is in range of a sensor, the device takes a measurement at each timestep.
-    The model we choose for our measurement device is a radar and as such the measurement function 
-    $z(k)=h(x(k))+v(k)$ associated with it is the cartesian to polar transformation, as shown below
+        \item blue : 1 sensors ON, happens only at the conrners of the grid
+        \item yellow : 2 sensors ON 
+        \item orange : 3 sensors ON 
+        \item red : 4 sensors ON 
+    \end{itemize}
+    Whenever the target is in range of a sensor at given timestep, the device takes a measurement.
+    The model choosen for our sensor is a Radar, and as such the non-linear measurement function
+     associated to it is the cartesian to polar transformation at timestep $k$, as shown below
     \begin{align*}
         &z(k)=h(x(k))+v(k)\\
         &\begin{bmatrix}
-            \rho(k)\\ \alpha(k)
+            \rho(k)\\ \theta (k)(k)
         \end{bmatrix}=  
         \begin{bmatrix}
-            \sqrt{x(k)^2+y(k)^2}\\ atan2(y(k)/x(k))
+            \sqrt{x_{1}(k)^2+x_{2}(k)^2}\\ atan2(x_{2}(1)/x_{1}(k))
         \end{bmatrix} +
         \begin{bmatrix}
             v_{1}(k)\\v_{2}(k)
         \end{bmatrix}
     \end{align*}
-    where $h(x)$ is the polar to cartesian cordinates transform and $v(k)$ is the noise associated to the measurement's operation.
-
+    where $h(x)$ is the polar to cartesian cordinates transform that takes in $x(k)$ that is the state (of which the first 2 elements are the cartesian
+    cordinates relative to the sensor), $z(k)$ is the measure and $v(k)$ is the noise associated to the measurement's operation. The measurement noise $w(k)$ is associated 
+    to a diagonal power spectral density matrix $R$.
     \begin{equation*}
-        \begin{bmatrix}
-            \rho\\ \alpha
-        \end{bmatrix}=  
-        \begin{bmatrix}
-            x^2+y^2\\ atan2(y/x)
-        \end{bmatrix} 
+        R=\begin{bmatrix}
+            \sigma^{2}_{\rho}&0\\
+            0&\sigma^{2}_{\theta (k)}
+        \end{bmatrix}
     \end{equation*}
-   for sake of use in the extended Kalman filter, a linearization of $h(x)$ must be performed.
-   The LS problem associate becomes
-   \begin{equation*}
-       x^{SL}(k)=arg min(Z^{k}-h(x)W(Z^{k}-h(x))^{T})= argmin J(x,k)
-   \end{equation*}
-   and we have to found 
-   \begin{equation*}
-     \frac{dJ(x,k)}{dx}=0
-\end{equation*}
-After a bit of management we can compute 
-\begin{equation*}
-    J(x,k)=Z^{k}
-\end{equation*}
-        and than it follows that
-        \begin{equation*}
-            \frac{dJ(x,k)}{dx}=-H(x)^{T}W(Z^{K}-h(x))=0
-        \end{equation*}
-        where $H(x)=\frac{dh(x)}{dx}$ So in this particular case:
-    \begin{equation}
-        H= \begin{bmatrix}
-            \frac{x}{(x^{2}+y^{2})^{1/2}} & \frac{y}{(x^{2}+y^{2})^{1/2}}& 0& 0 \\
-            \frac{-y}{(x^{2}+y^{2})}  & \frac{x}{(x^{2}+y^{2})}& 0& 0 \\
-        \end{bmatrix}
-    \end{equation}
+    \\
+   The matrix $H^{k}=(\nabla_{x} h(x))_{|x=x(k)}$ used in the linearized model with $v(k)=0$, necessary in the IMM filter at each timestep $k$,
+   computes to 
+    \begin{equation*}
+        H^{k}= \begin{bmatrix}
+            \frac{x_{1}}{\sqrt{x_{1}^{2}+x_{2}^{2}}} & \frac{x_{2}}{\sqrt{x_{1}^{2}+x_{2}^{2}}}& 0 \dots\\
+            \frac{-x_{2}}{x_{1}^{2}+x_{2}^{2}}  & \frac{x_{1}}{x_{1}^{2}+x_{2}^{2}}& 0 \dots\\
+        \end{bmatrix}_{|x(k)}
+    \end{equation*}
+    Where $0\dots$ is a vector of zeroes for all the other states that do not influence the measurement function.
+  
     \section*{Model used}
-    To models the movement of the target has been employed two models: The discrete Wienerprocess acceleration model (DWPA) (reference) and the unicycle model
-    Both are Markov process.
-    \subsection*{ Discrete Wiener Process Acceleration Model}
-    The Discrete Wienerprocess acceleration model choose are described by 5 different mode
-    \\
-    % \begin{tabular}{ |c|c|c|c|c|c| }
-    % \multicolumn{6}{|c|}{Models} \\
-    % \begin{tabular}{||c |c  | c  |c|c|c|c|c c c c c||}%{|width=\columnwidth|}
-    %     \hline
-    %      & DPWA && Unycicle \\
-    %     \hline
-    %          & Modes & Input & Modes & Inputs\\ [0.5ex]
-    %     \hline\hline
-    %     state 1 & costant velocity      & $\ddot{x},\ddot{y}=0$ & constant angular velocity &  $\ddot{\omega},\ddot{\alpha}=0$   \\
-    %     \hline
-    %     state 2  & north acceleration      & $\ddot{x}=\delta$  &  angular acceleration &  $\ddot{\omega}=\delta$ \\
-    %     \hline
-    %     state 3  & south acceleration    & $\ddot{x}=-\delta$   &  angular deceleration  & $\ddot{\omega}=-\delta$ \\
-    %     \hline
-    %     state 4  & east acceleration    & $\ddot{y}=\delta$    & acceleration steering (CW) & $\ddot{\omega}=\delta$ \\
-    %     \hline
-    %     state 5  & west acceleration     & $\ddot{y}=-\delta$  &  acceleration steering (CCW) & $\ddot{\omega}=-\delta$ \\ [1ex]
-    %     \hline
-    % \end{tabular}
+    As mentioned already, the agent we want to track has a variable-model dynamic that can switch between different elements in a set 
+    of models that we denote as $\mathbbm{M}$. We will consider 2 families of such sets that we will call: Random Accellerated Walk $\mathbbm{M}_{1}$ 
+    and Random Unicycle Turning $\mathbbm{M}_{2}$. Every element of said families is a discrete Markovian process, as all are influenced by a white 
+    noise on their inputs.
+    \subsection*{Random Accellerated Walk}
+    For the Random Accellerated Walk we consider the set $\mathbbm{M}_{1}$ to be 5 elements large. 
+    Here the elements are described
     \begin{center}
-    \begin{tabular}{||c||c |c |c| |}%{|width=\columnwidth|}
-        \hline
-         DPWA  \\
-        \hline\hline
-         Modes & Description & Input \\ [0.5ex]
-        \hline\hline
-        mode 1 & costant velocity      & $u(k)=0$    \\
-        \hline
-        mode 2  & north acceleration      & $u(k)=a $  \\
-        \hline
-        mode 3  & south acceleration    & $u(k)=-a $   \\
-        \hline
-        mode 4  & east acceleration    & $u(k)=a $    \\
-        \hline
-        mode 5  & west acceleration     & $u(k)=-a $   \\ [1ex]
-        \hline
-    \end{tabular}
-\end{center}
-    In the case of the DWPA we choosen to have 5 states: costant velocity, positive or negative acceleration
-    on x direction and positive or negative deceleration on y direction.
-    % \begin{tabular}{||c c c||}%[width=\columnwidth]
-    %     \hline
-    %     state 1 & costant velocity      & $\ddot{x},\ddot{y}=0$     \\
-    %     \hline
-    %     state 2  & north acceleration      & $\ddot{x}=\delta$        \\
-    %     \hline
-    %     state 3  & south acceleration    & $\ddot{x}=-\delta$        \\
-    %     \hline
-    %     state 4  & east acceleration    & $\ddot{y}=\delta$     \\
-    %     \hline
-    %     state 5  & west acceleration     & $\ddot{y}=-\delta$       \\ [1ex]
-    %     \hline
-    % \end{tabular} The Transition matrix 
-    % associated with the Markov's chain is shown below
-    % \begin{equation*}
-    %     \begin{bmatrix}
-    %         0.8 & 0.025 & 0.025 & 0.025 & 0.025 //
-    %     \end{bmatrix}
-    % \end{equation*}
-    The linear system describing the evolution of the state is 
+        \begin{tabular}{||c||c |c |}%{|width=\columnwidth|}
+            \hline
+             Random Walk  \\
+            \hline\hline
+             Mode & Behaviour  \\ [0.5ex]
+            \hline\hline
+            Mode 1 & Constant Speed \\
+            \hline
+            Mode 2  & Positive Acceleration in x  \\
+            \hline
+            Mode 3  & Negative Acceleration in x  \\
+            \hline
+            Mode 4  & Positive Acceleration in y  \\
+            \hline
+            Mode 5  & Negative Acceleration in y   \\ [1ex]
+            \hline
+        \end{tabular}
+    \end{center}
+
+    Every member of the set has the same structure 
+    to describe their dynamics, in state space this their shared linear model
     \begin{equation}
-        x(k+1)= Ax(k) + B(s)u(k) + Gw(k)
+        x(k+1)= Ax(k) + B(s)u + Gw(k)
     \end{equation}
-    Where $x(k)$ is the state at the current timestep, $u(t)$ is the input and $w(k)$ is the process noise.
-    In this case the state is a vector of the cartesian cordinates and their relative speed, while the input 
-    is the acceleration which the noise will influence. 
-    State,state and noise matrix associate to the DWPA has shown below:
+    where $A$ is the state matrix, $B(s)$ the input matrix function of the mode/index $s$ that indicates the element picked of $\mathbbm{M}_{1}$, 
+    $u$ is the input that stays constant at all timesteps $k$ and in all modes $s$, $G$ the noise matrix and $w(k)$ the process noise at timestep
+     $k$ with associated $Q_{1}$ diagonal power spectral density matrix.
+     \begin{equation*}
+        Q_{1}=\begin{bmatrix}
+            \sigma^{2}_{a_{x}}&0\\
+            0&\sigma^{2}_{a_{y}}
+        \end{bmatrix}
+    \end{equation*}
+     Below we show the constant matrices and how the state is structured
     \[ x=\begin{bmatrix} x \\ y \\ \dot{x} \\ \dot{y} \\ \end{bmatrix}  A=\begin{bmatrix}
-            1 & 0 & \delta & 0      \\
-            0 & 1 & 0      & \delta \\
-            0 & 0 & 1      & 0      \\
-            0 & 0 & 0      & 1      \\
-        \end{bmatrix}
-        G=\begin{bmatrix}
-            \delta^2/2 & 0          \\
-            0          & \delta^2/2 \\
-            \delta     & 0          \\
-            0          & \delta     \\
-        \end{bmatrix}
-    \]
-    With $\delta$ time step of the simulation.
-    \\
-    We hypothesize that the input is unknown in direction but known in magnitude. This set according to the current state at which the markov process is at the timestep.
-    This is modeled though the switch between a set of matrices $B(s)$ that change according to the chain's state $s$.
+        1 & 0 & \delta & 0      \\
+        0 & 1 & 0      & \delta \\
+        0 & 0 & 1      & 0      \\
+        0 & 0 & 0      & 1      \\
+    \end{bmatrix}
+    G=\begin{bmatrix}
+        \frac{\delta^{2}}{2} & 0          \\
+        0          & \frac{\delta^{2}}{2} \\
+        \delta     & 0          \\
+        0          & \delta     \\
+    \end{bmatrix}
+\]
+Where $x$ and $y$ are the cartesian coordinates in the absolute reference frame and $\delta$ is the duration of each timestep $k$.
+To model different behaviours of the agent/elements in the set $\mathbbm{M}_{1}$ we use switching matrices $B(s)$ while keeping the vector $u$ 
+constant. The input $u$ here is a vector of acceleration in $x$ and $y$ that the noise $w(k)$ will influence.
+We hypothesize that the input is always known in magnitude and constant. Here is the set $B(s)$ of input matrices.
     \begin{equation*}%[width=\columnwidth]
         \resizebox{.9 \columnwidth}{!}{
         $B(s)=\begin{Bmatrix}
@@ -291,26 +222,26 @@ After a bit of management we can compute
                 0          & 0 \\
             \end{bmatrix}
             \begin{bmatrix}
-                \delta^2/2 & 0 \\
+                \frac{\delta^{2}}{2} & 0 \\
                 0          & 0 \\
                 \delta     & 0 \\
                 0          & 0 \\
             \end{bmatrix}
             \begin{bmatrix}
-                -\delta^2/2 & 0 \\
+                -\frac{\delta^{2}}{2} & 0 \\
                 0          & 0 \\
                 -\delta     & 0 \\
                 0          & 0 \\
             \end{bmatrix}
             \begin{bmatrix}
                 0 & 0          \\
-                0 & \delta^2/2 \\
+                0 & \frac{\delta^{2}}{2} \\
                 0 & 0          \\
                 0 & \delta     \\
             \end{bmatrix}
             \begin{bmatrix}
                 0 & 0          \\
-                0 & -\delta^2/2 \\
+                0 & -\frac{\delta^{2}}{2} \\
                 0 & 0          \\
                 0 & -\delta     \\
             \end{bmatrix}
@@ -318,103 +249,128 @@ After a bit of management we can compute
         }
     \end{equation*}
     \\
-    It can be noticed that the matrix $G$ is a merge between the second and the fourth matrices found in the set $B(s)$ as the noise will act
-    randomly in direction and magnitude at every time-step.
-\subsection*{Unicycle mode}
-    The unycicle model has different input and state description. The input are represented by the angular acceleration of the wheel and the steering angle acceleration.
-    possible modes are 5: constant angular velocity, acceleration and deceleration of the wheel and positice or negative acceleration of the steering angle.
+    It is to note that the matrix $G$ is a merge between the second and the fourth matrices found in the set $B(s)$ as we hyphotesized that 
+     the noise will act randomly in direction and magnitude at every time-step.
+\\
+The jump between behaviours is modeled by a Markov chain that has a constant stochastic transition matrix $T$.
+In the simulations the matrix is fixed at
+\begin{equation*}
+    T=\begin{bmatrix}
+        p_{0}&p&p&p&p\\
+        b&q_{0}&2q&q&2q\\
+        b&2q&q_{0}&2q&q\\
+        b&q&2q&q_{0}&2q\\
+        b&2q&q&2q&q_{0}\\
+    \end{bmatrix}
+\end{equation*}
+Where $p_{0}$, $q_{0}$ and $b$ are fixed while $p$ and $q$ are computed so that the matrix is stochastic.
+\subsection*{Random Unicycle Turning}
+In the case of the Random Unicycle Turning we also consider the set $\mathbbm{M}_{2}$ to be 5 elements large, but the states are changed.
     \begin{center}
-        \resizebox{.99\columnwidth}{!}{ $
-        \begin{tabular}{||c||c |c |c| |}%{|width=\columnwidth|}
+        \begin{tabular}{||c||c |c |}%{|width=\columnwidth|}
             \hline
-             Unicycle  \\
+             Unycicle  \\
             \hline\hline
-             Modes & & Input \\ [0.5ex]
+            Mode & Behaviour  \\ [0.5ex]
             \hline\hline
-            mode 1 & costant angular velocity      & $u(k)=0$    \\
+            Mode 1 & Constant Tangential Velocity and Angle \\
             \hline
-            mode 2  & angular acceleration      & $u(k)=a $  \\
+            Mode 2  & Positive Angular Wheel Acceleration  \\
             \hline
-            mode 3  & angular deceleration    & $u(k)=-a $   \\
+            Mode 3  & Negative Angular Wheel Acceleration \\
             \hline
-            mode 4  & steer angle acceleration (CW)    & $u(k)=a $    \\
+            Mode 4  & Positive Yaw Rate  \\
             \hline
-            mode 5  & steer angle acceleration (CCW)     & $u(k)=-a $   \\ [1ex]
+            Mode 5  & Negative Yaw Rate   \\ [1ex]
             \hline
-        \end{tabular} $}
+        \end{tabular}
     \end{center}
-    Unycicle model instead is a Non-linear model. The  %Thus is necessary to use a linearization in the Kalman filter implementation
+Here all the elements in the set $\mathbbm{M}_{2}$ are non-linear models $x(k+1)=f(x(k),u(k),w(k),s)$, but if we can still organize them in such a way
     \begin{equation}
-        x(k+1)= Ax(k) + B(s)u(k) + Gw(k)
+        x(k+1)= A(x(k))x(k) + B(s,x(k))u(k) + G(x(k))w(k)
     \end{equation}
-    The matrix that represent the state of system for this case are
+By defining
     \begin{equation*}      
-     \resizebox{.99\columnwidth}{!}{ $ X=\begin{bmatrix} x \\ y \\ \theta \\ \omega \\ \end{bmatrix}  A=\begin{bmatrix}
-            1 & 0 & \delta cos(\dot{\theta}) & 0      \\
-            0 & 1 & 0      & \delta sin(\dot{\theta}) \\
+     \resizebox{.99\columnwidth}{!}{ $ x=\begin{bmatrix} x(k) \\ y(k) \\ v_{t}(k) \\ \alpha(k) \\ \end{bmatrix}  
+        A(x(k))=\begin{bmatrix}
+            1 & 0 & \delta cos(\dot{\alpha (k)}) & 0      \\
+            0 & 1 & 0      & \delta sin(\dot{\alpha (k)}) \\
             0 & 0 & 1      & 0      \\
             0 & 0 & 0      & 1      \\
         \end{bmatrix}
-         G=\begin{bmatrix}
-            \delta^2/2 cos(\theta)r & 0  \\
-            \delta^2/2 sin(\theta)r & 0 \\
+         G(x(k))=\begin{bmatrix}
+            \frac{\delta^{2}}{2} cos(\alpha (k))r & 0  \\
+            \frac{\delta^{2}}{2} sin(\alpha (k))r & 0 \\
             \delta r    & 0          \\
             0 & \delta     \\
         \end{bmatrix}
     $ } \end{equation*}
-
-    We hypothesize that the input is unknown in direction but known in magnitude. This set according to the current state at which the markov process is at the timestep.
-    This is modeled though the switch between a set of matrices $B(s)$ that change according to the chain's state $s$.
-    \begin{equation*}%[width=\columnwidth]
-        \resizebox{.99 \columnwidth}{!}{
-        $B(s)=\begin{Bmatrix}
-            \begin{bmatrix}
-                0 & 0 \\
-                0          & 0 \\
-                0     & 0 \\
-                0          & 0 \\
-            \end{bmatrix}
-            \begin{bmatrix}
-                \delta^2/2 cos(\theta)r & 0 \\
-                \delta^2/2 sin(\theta)r & 0 \\
-                \delta r    & 0 \\
-                0          & 0 \\
-            \end{bmatrix}
-            \begin{bmatrix}
-                -\delta^2/2 cos(\theta)r & 0 \\
-                -\delta^2/2 sin(\theta)r & 0 \\
-                -\delta r    & 0 \\
-                0          & 0 \\
-            \end{bmatrix}
-            \begin{bmatrix}
-                0 & 0          \\
-                0 & 0 \\
-                0 & 0          \\
-                0 & \delta     \\
-            \end{bmatrix}
-            \begin{bmatrix}
-                0 & 0          \\
-                0 & 0 \\
-                0 & 0          \\
-                0 & -\delta     \\
-            \end{bmatrix}
-        \end{Bmatrix} $ 
-        }
-    \end{equation*}
-    \\
-    Also in this case it's possible to notice that $G(s)$ is a merge of $B(s)$
-    Therefore in the EKF a linearised model is needed
-    and som
-    \begin{equation*}
-        A(k)
-    \end{equation*} 
-    \subsection*{Data's simulation}
-
-    \section*{Imm and Linear Consensus}
+and 
+\begin{equation*}%[width=\columnwidth]
+    \resizebox{.99 \columnwidth}{!}{
+    $B(s,k)=\begin{Bmatrix}
+        \begin{bmatrix}
+            0 & 0 \\
+            0          & 0 \\
+            0     & 0 \\
+            0          & 0 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            \frac{\delta^{2}}{2} cos(\alpha (k))r & 0 \\
+            \frac{\delta^{2}}{2} sin(\alpha (k))r & 0 \\
+            \delta r    & 0 \\
+            0          & 0 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            -\frac{\delta^{2}}{2} cos(\alpha (k))r & 0 \\
+            -\frac{\delta^{2}}{2} sin(\alpha (k))r & 0 \\
+            -\delta r    & 0 \\
+            0          & 0 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 0          \\
+            0 & 0 \\
+            0 & 0          \\
+            0 & \delta     \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 0          \\
+            0 & 0 \\
+            0 & 0          \\
+            0 & -\delta     \\
+        \end{bmatrix}
+    \end{Bmatrix} $ 
+    }
+\end{equation*}
+where $\delta$ is the length of the timestep $k$, $r$ the radius of the unicycle's wheel, $x(k)$ and $y(k)$ absolute cartesian cordinates of the unicycle, 
+$v_{t}(k)$ tangential velocity and $\alpha$ yaw angle.
+The input $u$ is a vector of the angular acceleration of the wheel $\omega$ and yaw rate $\Omega$ with
+\begin{equation*}
+    Q_{2}=\begin{bmatrix}
+        \sigma^{2}_{\omega}&0\\
+        0&\sigma^{2}_{\Omega}
+    \end{bmatrix}
+\end{equation*}
+Just as in $\mathbbm{M}_{1}$, $G$ is build on the hypothesis that the process noise $w(k)$ influences both inputs at any timestep $k$.
+\\
+The stochastic transition matrix in this case will be 
+\begin{equation*}
+    T=\begin{bmatrix}
+        p_{0}&p&p&p&p\\
+        q&q_{0}&q&0&0\\
+        q&q&q_{0}&0&0\\
+        q&0&0&q_{0}&q\\
+        q&0&0&q&q_{0}
+    \end{bmatrix}
+\end{equation*}
+where $p_{0}$ and $q_{0}$ are fixed while $p$ and $q$ are computed to make the matrix stochastic.
+\section*{IMM}
     In order to reach a more accurate prediction of the trajectory a IMM algorithm is implemented in the sensors's grid. The working principles 
     involves a general knowledge or hypothesis of the model of agent's movement. Every model is used in a Kalman filter stage that use the same measurement and make
     a prediction: the one with the smaller uncertainty is choose as the model for our agent at that timestep. A general scheme of the working principles is shown here (image?)
     \\
+
+    \section*{Consensus}
     The set of active sensors inside the grid is dynamic, as vertices keep getting added and popped. However it has to be noticed, as stated before, that no 
      more than 4 sensors will be ON at any point of time and they will all be adjacent to each other, this let us model the graph of the active 
      sensors as fully-connected, since the distance between them is short and they are directly linked.
