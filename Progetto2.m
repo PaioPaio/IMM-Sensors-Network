@@ -7,13 +7,13 @@ clc; clear all; close all;
 
 caso=2;
 %delta time
-delta=0.05;
+delta=0.9;
 %at which rate do we do the consensus ?
-rate=10000;
+rate=10;
 %Maximum number of iteration
-nstop=1000;
+nstop=200;
 %iterations montecarlo
-nmonte=100;
+nmonte=1;
 %Plot
 videon = 0;
 ploton =0;
@@ -98,10 +98,6 @@ switch caso
         Transmat(4,:)=[q 0 0 q1 q];
         Transmat(5,:)=[q 0 0 q q1];
         %initial 2D position, velocity and acceleration
-        x0=zeros(nx,1);
-        x0([1,2])=[-1;-1]+2.*rand(2,1);
-        x0(3)=0.3;
-        x0(4)=pi/3;
         %radius, called like this for reasons
         ABG=0.5;
         %Power spectra density of process noise
@@ -114,7 +110,7 @@ end
 howconfident=0.95;
 s=1;
 
-%Senosors
+%Sensors
 range=10;
 R=diag([0.1,(2*pi/180)^2]);               %sensor covariance
 
@@ -247,9 +243,6 @@ for y=1:nmonte
     
     xksens=[];
     Pksens=cell(1,lon);
-    
-    % xgrid=-range*nq/2:range:range*nq/2;
-    % ygrid=xgrid;
     
     curve1 = animatedline('Color','r');
     curve2= animatedline('Color','b');
@@ -425,7 +418,7 @@ for y=1:nmonte
                 else
                 sensors{kk,ll}.mu=sensors{kk,ll}.mu';
                 end
-                %             sensors{kk,ll}.mu=sensors{kk,ll}.mu';
+                %           
                 %pick xcons of all on sensors
                 %
                 xconsallsensor{n,i}=sensors{kk,ll}.xcons;
@@ -679,9 +672,9 @@ mediamedienocons=rms(rmsnocons)
 maxmedianocons=max(rmsnocons)
 maxmaxnocons=max(maxerrnocons)
 
-% mediasens=mean(rmssenserr)
-% mediamaxsens=mean(maxnsenserr)
-% maxsens=max(maxnsenserr)
+ mediasens=mean(rmssenserr)
+ mediamaxsens=mean(maxnsenserr)
+ maxsens=max(maxnsenserr)
 
 saveas(fig4,'errpos.png')
 saveas(fig5,'errorspeed.png')

@@ -66,7 +66,7 @@ for i=1:alto
             L(i)=0.0001;
         end
     else
-        "S negative definite o qualcosa che non so spiegare"
+       % "S negative definite"
     end
     
 end
@@ -82,7 +82,5 @@ Pkk=zeros(largo);
 for i=1:alto
     Pkk=Pkk+(Ppred(:,:,i)+(xkk-xpred(:,i))*(xkk-xpred(:,i))')*muk1(i);
 end
-if rcond(Pkk)<1e-7
-    "P risultato IMM troppo piccola"
-end
+
 end

@@ -1,5 +1,5 @@
 function x = tellyourfriends(sensor,grid,message)
-%x->fake output cause matlab is stupid
+%x->fake output cause matlab 
 %sensor->Sensor object, grid->cell array of sensors, message->string
 %this function sends a message to every sensor in the neighboor of the one
 %that has changed it's state. 

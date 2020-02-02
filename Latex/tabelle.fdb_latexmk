@@ -1,5 +1,12 @@
 # Fdb version 3
-["pdflatex"] 1580602757 "tabelle.tex" "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/tabelle.pdf" "tabelle" 1580602763
+["bibtex tabelle"] 1580638650 "tabelle.aux" "tabelle.bbl" "tabelle" 1580639349
+  "C:/Program Files/MiKTeX 2.9/bibtex/bst/bibtex/ieeetr.bst" 1291864344 18361 1a00e58565e7f19bf2b3e1bfb82254ae ""
+  "biblio.bib" 1580638630 1062 eaeb75caa3813d9c55696084168f5c7c ""
+  "tabelle.aux" 1580639348 814 150cf1ce8d04a19b8300c3ebbc54570e "pdflatex"
+  (generated)
+  "tabelle.blg"
+  "tabelle.bbl"
+["pdflatex"] 1580639343 "tabelle.tex" "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/tabelle.pdf" "tabelle" 1580639349
   "C:/Program Files/MiKTeX 2.9/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1233951848 1004 54797486969f23fa377b128694d548df ""
   "C:/Program Files/MiKTeX 2.9/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1233951848 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
   "C:/Program Files/MiKTeX 2.9/fonts/tfm/public/cm/cmbx12.tfm" 1136765053 1324 c910af8c371558dc20f2d7822f66fe64 ""
@@ -49,7 +56,7 @@
   "C:/Program Files/MiKTeX 2.9/tex/latex/oberdiek/hopatch.sty" 1577803650 5057 6648041682ebe04b593782d9f2fd9559 ""
   "C:/Program Files/MiKTeX 2.9/tex/latex/xkeyval/xkeyval.sty" 1419270738 5114 9c1069474ff71dbc47d5006555e352d3 ""
   "C:/Users/erikz/AppData/Local/MiKTeX/2.9/miktex/data/le/pdftex/pdflatex.fmt" 1579707141 4265336 dafc9a47adeabaeef13744233c3cbed1 ""
-  "C:/Users/erikz/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map" 1580572289 83751 6e4565e2a96ca36e797cc3ed7d4e67f8 ""
+  "C:/Users/erikz/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map" 1580633127 83751 6e4565e2a96ca36e797cc3ed7d4e67f8 ""
   "C:/Users/erikz/AppData/Roaming/MiKTeX/2.9/tex/context/base/mkii/supp-pdf.mkii" 1550860920 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "C:/Users/erikz/AppData/Roaming/MiKTeX/2.9/tex/generic/atbegshi/atbegshi.sty" 1575571100 24708 5584a51a7101caf7e6bbf1fc27d8f7b1 ""
   "C:/Users/erikz/AppData/Roaming/MiKTeX/2.9/tex/generic/bigintcalc/bigintcalc.sty" 1576433602 40635 c40361e206be584d448876bba8a64a3b ""
@@ -98,12 +105,13 @@
   "C:/Users/erikz/AppData/Roaming/MiKTeX/2.9/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1575571282 9715 b051d5b493d9fe5f4bc251462d039e5f ""
   "C:/Users/erikz/AppData/Roaming/MiKTeX/2.9/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/erikz/AppData/Roaming/MiKTeX/2.9/tex/latex/varwidth/varwidth.sty" 1238465940 10894 d359a13923460b2a73d4312d613554c8 ""
-  "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/tabelle.aux" 1580602762 779 1aed00a6d1a6c5fbd3108509af9e8089 ""
-  "tabelle.aux" 1580602762 779 1aed00a6d1a6c5fbd3108509af9e8089 "pdflatex"
-  "tabelle.tex" 1580602755 20564 a940610a549def513f69245f423df84d ""
+  "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/tabelle.aux" 1580639348 814 150cf1ce8d04a19b8300c3ebbc54570e ""
+  "tabelle.aux" 1580639348 814 150cf1ce8d04a19b8300c3ebbc54570e "pdflatex"
+  "tabelle.bbl" 1580638650 52 0eba253fc001332e731e8aba3f23127b "bibtex tabelle"
+  "tabelle.tex" 1580639340 20760 b75ec70ebcebdfded0523a27d7a92552 ""
   (generated)
-  "tabelle.aux"
-  "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/tabelle.log"
   "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/tabelle.pdf"
   "tabelle.pdf"
+  "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/tabelle.log"
+  "tabelle.aux"
   "tabelle.log"

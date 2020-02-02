@@ -1,14 +1,14 @@
 classdef Sensor<handle
     properties
        range {}                 %how far can the sensor work
-       R {}                     %diagonal cuz we cool
+       R {}                     %diagonal 
        
        sensed {}                %[distance,angle]
        
        position {}              %position of the sensor in the room
        ingrid {}                %indices in the grid
        
-       inrange=false            %pretty selfexplanatory
+       inrange=false            %check on range
        state {}                 %on/idle/off
        neighboors {}            %cell array with indices of listeners/sources
        activevertex{}           %active graph indices
