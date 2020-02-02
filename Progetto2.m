@@ -9,11 +9,11 @@ caso=2;
 %delta time
 delta=0.05;
 %at which rate do we do the consensus ?
-rate=10000;
+rate=10;
 %Maximum number of iteration
-nstop=1000;
+nstop=10;
 %iterations montecarlo
-nmonte=100;
+nmonte=1;
 %Plot
 videon = 0;
 ploton =0;
