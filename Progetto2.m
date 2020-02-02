@@ -98,10 +98,6 @@ switch caso
         Transmat(4,:)=[q 0 0 q1 q];
         Transmat(5,:)=[q 0 0 q q1];
         %initial 2D position, velocity and acceleration
-        x0=zeros(nx,1);
-        x0([1,2])=[-1;-1]+2.*rand(2,1);
-        x0(3)=0.3;
-        x0(4)=pi/3;
         %radius, called like this for reasons
         ABG=0.5;
         %Power spectra density of process noise

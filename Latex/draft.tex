@@ -82,9 +82,9 @@ Sensors in different states differ between each other by the actions that are al
 \\
 Here we enumerate such allowed actions:
 \begin{itemize}
-    \item ON: at each time-step checks if it is still in range with the function inRange(), takes a measurement, computes the IMM algorithm and
-          at a tunable rate computes the consensus with the other nearby ON sensors. If it's not in range anymore then turns IDLE.
-    \item IDLE : checks if it is now in range with the function inRange(), if it is then initialize itself with the data from nearby sensors
+    \item ON: at each time-step checks if the agents is still in range with the function inRange(), takes a measurement, computes the IMM algorithm and
+          at a tunable rate computes the consensus with the other nearby ON sensors. If the agent is not in range anymore then turns IDLE.
+    \item IDLE : checks if the agent is now in range with the function inRange(), if it is then initialize itself with the data from nearby sensors
           that are ON. If it recieves a CantSense signal, it checks if at least one of its neighboors is still ON, else it turns OFF itself.
     \item OFF : does nothing but waits for a CanSense signal sent by a neighboor and turns IDLE in the case it has received one (this means that
           a nearby sensor has turned ON).
@@ -121,7 +121,7 @@ This fact is shown in the following picture that illustrates the different cases
 Note that the blue case happens only at the borders and corners of the grid.
 \\
 Whenever the target is in range of a sensor at given timestep, the device takes a measurement.
-The model choosen for our sensor is a Radar, and as such the non-linear measurement function
+The model chosen for our sensor is that of a radar, and as such the non-linear measurement function
 associated to it is the cartesian to polar transformation at timestep $k$, as shown below
 \begin{align*}
      & z(k)=h(x(k))+v(k)          \\
@@ -136,7 +136,7 @@ associated to it is the cartesian to polar transformation at timestep $k$, as sh
     \end{bmatrix}
 \end{align*}
 where $h(x)$ is the polar to cartesian cordinates transform that takes in $x(k)$ that is the state (of which the first 2 elements are the cartesian
-cordinates relative to the sensor), $z(k)$ is the measure and $v(k)$ is the noise associated to the measurement's operation. The measurement noise $w(k)$ is associated
+cordinates relative to the sensor), $z(k)$ is the measure and $v(k)$ is the noise associated to the measurement's operation. The measurement noise $v(k)$ is associated
 to a diagonal power spectral density matrix $R$.
 \begin{equation*}
     R=\begin{bmatrix}
@@ -158,7 +158,7 @@ Where $0\dots$ is a vector of zeroes for all the other states that do not influe
 \section*{Model used}
 As mentioned already, the agent we want to track has a variable-model dynamic that can switch between different elements in a set
 of models that we denote as $\mathbbm{M}$. We will consider 2 families of such sets that we will call: Random Accelerated Walk $\mathbbm{M}_{1}$
-and Random Unicycle Turning $\mathbbm{M}_{2}$. Every element of said families is a discrete Markovian process, as all are influenced by a white
+and Random Unicycle Turning $\mathbbm{M}_{2}$. Every element of said families is a discrete Markovian process, as all are influenced by
 noise on their inputs.
 \subsection*{Random Accelerated Walk}
 For the Random Accelerated Walk we consider the set $\mathbbm{M}_{1}$ to be 5 elements large.
@@ -182,12 +182,11 @@ Here the elements are described
         \hline
     \end{tabular}
 \end{center}
-
 Every member of the set has the same structure
 to describe their dynamics, in state space this their shared linear model
-\begin{equation}
+\begin{equation*}
     x(k+1)= Ax(k) + B(s_{k})u + Gw(k)
-\end{equation}
+\end{equation*}
 where $A$ is the state matrix, $B(s_{k})$ the input matrix function of the mode/index $s_{k}$ that indicates the element picked of $\mathbbm{M}_{1}$ at timestep $k$,
 $u$ is the input that stays constant at all timesteps $k$ and in all modes $s_{k}$, $G$ the noise matrix and $w(k)$ the process noise at timestep
 $k$ with associated $Q_{1}$ diagonal power spectral density matrix.
@@ -370,8 +369,7 @@ where $p_{0}$ and $q_{0}$ are fixed while $p$ and $q$ are computed to make the m
 
 \section*{IMM}
 Being the agent's dynamic costantly switching between the models in the set chosen, a single Kalman filter won't give us acceptable results while
-tracking and we have to rely on the Interacting Multiple Models algorithm (IMM). In essence the algorithm let various estimation filters work in parallel
-(EKF in our case), and outputs a mixture of the filters' estimate based on the probability of each of the models used in the filter to be correct.
+tracking and we have to rely on the Interacting Multiple Models algorithm (IMM). In essence the algorithm let various estimation filters work in parallel, and outputs a mixture of the filters' estimate based on the probability of each of the models used in the filter to be correct.
 \\
 The hyphotheses we have to make in order to use the IMM are that the sequence of the true mode at timestep $k$, $s_{k}$, is a Markovian process, i.e. the mode evolves to the
 memoryless random process $P\{s_{k+1}^{(j)}|s_{k}^{(j)}\}\pi_{ji}$ $\forall\ j,i$ and that the model set $\mathbbm{M}$ is the correct one and is time-invariant.
@@ -381,7 +379,7 @@ The design parameters of the IMM are the model set $\mathbbm{M}$, the process an
 matrices $Q$ and $R$ for each model and sensor, the initial state and covariance $\hat{x}_{0|0}$ and $P_{0|0}$
 and the transition matrix $T$ containing all the $\pi_{ji}$.
 \\
-Following is a short recapof the algorithm, to see it in much more detail refer to %\cite%
+Following is a short recap of the algorithm, to see it in much more detail refer to CITA QUA
 \\
 The algorithm can be subdivided in 4 subsections, :
 \begin{itemize}
@@ -427,14 +425,17 @@ The algorithm can be subdivided in 4 subsections, :
            $k$, and we compute the $L^{(i)}_{k}$ probability density function in $\bar{z}^{(i)}_{k}$. Using this result we re-normalize the previously 
            computed $\mu^{(i)}_{k|k-1}$ to give us the output vector of model probabilities $\mu_{k}$.
            \\
-           In this step a lower bound on the likelihood is implemented since a likelihood vector of $0$ breaks the algorithm.
+           In this step two adjustment are needed: the first one is the choice to use a logaritmic pdf instead of a normal one due 
+           to the fact that it gives better numerical results and lower bound on the likelihood is implemented since a likelihood 
+           vector of $0$ breaks the algorithm.
     \item Estimate fusion
           \begin{align*}
                & \hat{x}_{k|k}=\sum_{i}x^{(i)}_{k|k}\mu^{(i)}_{k}                                                                      \\
                & P_{k|k}=\sum_{i}[P^{(i)}_{k|k}+(\hat{x}_{k|k}-\hat{x}^{(i)}_{k|k})(\hat{x}_{k|k}-\hat{x}^{(i)}_{k|k})^{T}]\mu_{k}^{i}
           \end{align*}
           Using the vector $\mu_{k}$ computed at the previous step we mix all of the predictions computed by the filters to get 
-          the outputs. This last step is only for the sake of the output, the algorithm forms a loop without it.
+          the outputs. This last step is only for the sake of the output, the algorithm forms a loop without it as the starting step of 
+          the next iteration uses the outputs of the filters at the steps before this one.
 \end{itemize}
 \section*{Consensus}
 Right after having computed the IMM's estimate for every ON sensor, we use a consensus algorithm to try to lower the
@@ -455,17 +456,17 @@ where $P^{k}$ is the block diagonal matrix built with all the covariance matrice
 is the measurement vector built by stacking all the state predictions from the IMM's output and $H^{k}$ is the matrix build by
 stacking all the $H_{i}$ for $z_{i}=H_{i}x+\epsilon_{i}$, luckily in our case all $H_{i}$ are identity matrices.\\
 It has to be noted that the WLS can be seen as 2 parallel linear consensus algorithms, running one on top of the other.
-The consensus is computed both on the output of the IMM filter and all the outputs of its internal Kalman filters.
+The consensus is computed both on the output of the IMM filter and all the outputs of its internal Kalman filters. 
+The same WLS algorithm is used to initialize IDLE sensors that turn ON using data from nearby ON sensors.
 \\
 We also tentatively tried to use the same consensus algorithm on the prediction vector of model probabilities $\mu_{k}$ using
 the collection of all $\mu^{j|i}_{k-1}$ in matrix form instead of the covariance matrix for the weighting matrix, but
 the resulting matrix was too close to singularity and the simulation was having numerical problems so this road
 was abandoned, instead we just computed the mean between the various $\mu_{k}$.
-\newpage
 \section*{Results}
-Here we present the results of our implementation of the algorithm and sensors. The agent was left wandering inside the set virtual room 
-and measured at each timestep the estimation error that the algorithm gave. The room is set to be a square with a $100m$ side with a $10\times 10$ 
-grid of sensors with range$=10$. 
+Here we present the results of our implementation of the algorithm and sensors' grid. The agent was left wandering inside the set virtual room 
+and at each timestep the estimation error of the algorithm was measured. The room is set to be a square with a $100m$ side with a $10\times 10$ 
+grid of sensors with range$=10m$. 
 \\
 The simulations were performed in a loop according to the Montecarlo's Method. We set a number of iterations for any specific case to 
 $n_{monte}=100$ and each iteration stop wheter the agent leaves the room limits or a number of timesteps $n_{k}=1000$ is reached. The starting
@@ -477,7 +478,8 @@ The performance indexes that we evaluated are:
     \item The Maximum error between all Montecarlo's iterations
 \end{itemize}
 We evaluated both model sets $\mathbbm{M}_{1}$ and $\mathbbm{M}_{2}$ for different consensus rate (how many timestep between each consensus), 
-different $R$s and $Q$s and we considered both the errors given by the Consensus and by each individual sensor's IMM. 
+different $R$ and $Q$ and we considered both the errors given by the Consensus and by each individual sensor's IMM. We've also run simulations 
+with noconsensus at all.
 \\
 The timestep $\delta$ is set at $0.05s$, the radius of the wheel $r$ at $0.5m$ while the inputs are
 \begin{align*}
@@ -489,7 +491,24 @@ The timestep $\delta$ is set at $0.05s$, the radius of the wheel $r$ at $0.5m$ w
     \end{bmatrix}
 \end{align*}
 The power spectral density matrices considered are $R1=diag(0.1,(\frac{2\pi}{180})^{2})$ and $R2=diag(0.01,(\frac{2\pi}{360})^{2})$ for all the sensors, 
-and while $Q2=diag(1,1)$ is shared by $\mathbbm{M}_{1}$ and $\mathbbm{M}_{2}$, $Q1=diag(0.2,0.2)$ for $\mathbbm{M}_{2}$ and $Q1=diag(0.1,0.1)$ for $\mathbbm{M}_{1}$.
+and while $Q2=diag(1,1)$ is shared by $\mathbbm{M}_{1}$ and $\mathbbm{M}_{2}$, $Q1=diag(0.2,0.2)$ for $\mathbbm{M}_{2}$ and $Q1=diag(0.1,0.1)$ for 
+$\mathbbm{M}_{1}$. The Transition matrices were initializated as follows
+\begin{align*}
+    &T_{1}=\begin{bmatrix}
+        0.6&0.1&0.1&0.1&0.1\\
+        0.2&0.5&0.12&0.06&0.06\\
+        0.2&0.12&0.5&0.12&0.06\\
+        0.2&0.06&0.12&0.5&0.12\\
+        0.2&0.12&0.06&0.12&0.5\\
+    \end{bmatrix}\\
+    &T_{2}=\begin{bmatrix}
+        0.8&0.05&0.05&0.05&0.05\\
+        0.25&0.5&0.25&0&0\\
+        0.25&0.25&0.5&0&0\\
+        0.25&0&0&0.5&0.25\\
+        0.25&0&0&0.25&0.5\\
+    \end{bmatrix}
+\end{align*}
 \\
 The first case is $\mathbbm{M}_{1}$, the second $\mathbbm{M}_{2}$. Here are reported all the results of the simulations, all in meters.
 %%%%%%%%%%%% SENSOR %%%%%%%%%%%%%%%%%%%
@@ -514,7 +533,7 @@ The first case is $\mathbbm{M}_{1}$, the second $\mathbbm{M}_{2}$. Here are repo
 \end{center}
 This table is needed to compare the simulations results, because the power spectral density matrices $R$ regard the polar coordinates, while here
  we have the errors in cartesian. If the algorithm gives an error greater in all cases than what is given by the sensors, 
-then it is useless.
+then it is useless. 
 
 \begin{center}
     \resizebox{.99 \columnwidth}{!}{ $
@@ -905,7 +924,7 @@ parameter and performs really bad with $R1$.
 While we see that with both model sets the case with rate=20 gives very good results, but we also notice that the maximum of both the individual 
 IMMs and of the consensus can get pretty high so if we have an application where the frequency of estimation must be high and we can't 
 have a big overshoot, then this rate can fail.
-All things considered the best compromise may be the rate=10, which always gives good results and has double the frequency of rate=20.
+All things considered the best trade-off may be the rate=10, which always gives good results and has double the frequency of rate=20.
 \\
 Following are some graphs of the best and worst cases computed by the simulations. More graphs and a video of the algorithm working can 
 be found at ... 
