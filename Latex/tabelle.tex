@@ -15,31 +15,25 @@
 \usepackage[document]{ragged2e}
 \usepackage{adjustbox}
 \usepackage{subcaption}
-
+\title{Report and analysis on implementation of IMM algorithm for multiple-model dynamics tracking}
+\author{
+    Paiola Lorenzo 198573 
+    Zanolli Erik 198852}
+    \date{January 2020}
+    \begin{document}
+    \maketitle
+\section*{int}
 %%%%%%%%%%%% Caso 1 %%%%%%%%%%%%%
 %%%%%%%%%%%% Caso 1 %%%%%%%%%%%%%
 %%%%%%%%%%%% Caso 1 %%%%%%%%%%%%%
 
 %%%%%%% rate 20 %%%%%\title{Report and analysis on implementation of IMM algorithm for multiple-model dynamics tracking}
-\title{Report and analysis on implementation of IMM algorithm for multiple-model dynamics tracking}
-\author{
-    Paiola Lorenzo 198573 
-    
-    Zanolli Erik 198852}
-    \date{January 2020}
-    
-    
-    
-    
-    
-    \begin{document}
-    
-    \maketitle
-\section*{int}
+
 \begin{center}
+    \resizebox{.99 \columnwidth}{!}{ $
     \begin{tabular}{ |c||c|c|c|  }
         \hline
-        \multicolumn{4}{|c|}{consensus20} \\
+        \multicolumn{4}{|c|}{case 1: consensus rate = 20} \\
         \hline
         IMM  & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
         \hline
@@ -51,9 +45,9 @@
             \hline
             R2,Q2           & 0.0514                & 0.1313             & 0.2549                   \\
         \hline
-        \multicolumn{4}{|c|}{consensus20} \\
+        \multicolumn{4}{|c|}{} \\
         \hline
-        W/o Cons  & Mean of Imm's mean    & Max of Imm's mean     & max of IMM's max  \\ 
+        W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
         \hline
         R1,Q1           & 0.1609                & 0.1762                & 2.0937                 \\
         \hline
@@ -63,49 +57,399 @@
         \hline
         R2,Q2           & 0.0815                & 0.0926            & 0.4445                   \\
     \hline
-       \end{tabular}
+       \end{tabular} $}
     \end{center}
 
 
     %%%%%%% rate 10 %%%%%
 
 
-
-
-
-
-
-
-
-
-
+    \begin{center}
+        \resizebox{.99 \columnwidth}{!}{ $
+        \begin{tabular}{ |c||c|c|c|  }
+            \hline
+            \multicolumn{4}{|c|}{case 1: consensus rate = 10} \\
+            \hline
+            IMM                 & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+            \hline
+                R1,Q1           & 0.1110                & 0.2831                & 0.4460                 \\
+                \hline
+                R1,Q2           & 0.1129                & 0.2940             & 0.5227                      \\
+                \hline
+                R2,Q1           & 0.0516                &  0.1406           & 0.2226                         \\
+                \hline
+                R2,Q2           & 0.0519                & 0.1331             & 0.2429                   \\
+            \hline
+            \multicolumn{4}{|c|}{} \\
+            \hline
+            W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+            \hline
+            R1,Q1           & 0.1455                & 0.1678                & 0.9                 \\
+            \hline
+            R1,Q2           & 0.1478                & 0.1926             & 1.5835                     \\
+            \hline
+            R2,Q1           & 0.0751               &  0.0853           & 0.4441                        \\
+            \hline
+            R2,Q2           & 0.0756                & 0.0824            & 0.4522                   \\
+        \hline
+           \end{tabular} $}
+        \end{center}
 
 
 
 %%%%%%% rate 5 %%%%%
-
-
-
-
-
-
+\begin{center}
+    \resizebox{.99 \columnwidth}{!}{ $
+    \begin{tabular}{ |c||c|c|c|  }
+        \hline
+        \multicolumn{4}{|c|}{case 1: consensus rate = 5} \\
+        \hline
+        IMM                 & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+        \hline
+            R1,Q1           & 0.1158                & 0.3516                & 1.2838                 \\
+            \hline
+            R1,Q2           & 0.1192                & 0.3245             & 0.5018                      \\
+            \hline
+            R2,Q1           & 0.0553                &  0.1649           & 0.3532                         \\
+            \hline
+            R2,Q2           & 0.0542                & 0.1649             & 0.2246                   \\
+        \hline
+        \multicolumn{4}{|c|}{} \\
+        \hline
+        W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+        \hline
+        R1,Q1           & 0.1302                & 0.2460                & 1.808                 \\
+        \hline
+        R1,Q2           & 0.1359                & 0.1700             & 1.7787                     \\
+        \hline
+        R2,Q1           & 0.0666               &  0.0762           & 0.762                         \\
+        \hline
+        R2,Q2           & 0.0661                & 0.0738            & 0.4450                   \\
+    \hline
+       \end{tabular} $}
+    \end{center}
 
 %%%%%%% rate 2 %%%%%
-
+\begin{center}
+    \resizebox{.99 \columnwidth}{!}{ $
+    \begin{tabular}{ |c||c|c|c|  }
+        \hline
+        \multicolumn{4}{|c|}{case 1: consensus rate = 2} \\
+        \hline
+        IMM  & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+        \hline
+        R1,Q1           & 0.1158                & 0.3516               & 1.2838                \\
+            \hline
+            % R1,Q2           & 0.1094                & 0.2694             & 0.4671                      \\
+            % \hline
+            R2,Q1           & 0.0598                &  0.1925           & 0.2654                         \\
+            % \hline
+            % R2,Q2           & 0.0514                & 0.1313             & 0.2549                   \\
+        \hline
+        \multicolumn{4}{|c|}{} \\
+        \hline
+        W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+        \hline
+        R1,Q1           & 0.1320                & 0.2460                & 1.808                 \\
+        \hline
+        % R1,Q2           & 0.1625                & 0.1907             & 1.0347                     \\
+        % \hline
+        R2,Q1           & 0.0617               &  0.0741           & 0.4368                         \\
+        % \hline
+        % R2,Q2           & 0.0815                & 0.0926            & 0.4445                   \\
+    \hline
+       \end{tabular} $}
+    \end{center}
 
 
 
 
 %%%%%%% rate 1 %%%%%
-
+\begin{center}
+    \resizebox{.99 \columnwidth}{!}{ $
+    \begin{tabular}{ |c||c|c|c|  }
+        \hline
+        \multicolumn{4}{|c|}{case 1: consensus rate = 1} \\
+        \hline
+        IMM  & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+        \hline
+             R1,Q1           & 0.4265                & 1.6287               & 4.5672                 \\
+            \hline
+            % R1,Q2         & 0.0757                & 0.204             & 0.2612                        \\
+            % \hline
+            R2,Q1            & 0.0757                & 0.204             & 0.2612                           \\
+            % \hline
+            % R2,Q2           & 0.0514                & 0.1313             & 0.2549                   \\
+        \hline
+        \multicolumn{4}{|c|}{} \\
+        \hline
+        W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+        \hline
+        R1,Q1           & 0.3755                & 0.8706                & 5.9070                \\
+        % \hline
+        % R1,Q2           & 0.1625                & 0.1907             & 1.0347                     \\
+        \hline
+        R2,Q1           & 0.0766               &  0.1128          & 0.4872                         \\
+        % \hline
+        % R2,Q2           & 0.0815                & 0.0926            & 0.4445                   \\
+    \hline
+       \end{tabular} $}
+    \end{center}
 
 
 
 
 %%%%%%% no cons %%%%%
+\begin{center}
+    \resizebox{.99 \columnwidth}{!}{ $
+    \begin{tabular}{ |c||c|c|c|  }
+        \hline
+        \multicolumn{4}{|c|}{case 1: consensus rate = 2} \\
+        \hline
+        W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+        \hline
+        R1,Q1           & 0.1790                & 0.2278                & 1.7442                 \\
+        \hline
+         R1,Q2           & 0.1800              &  0.2782           & 6.4459               \\
+         \hline
+        R2,Q1            & 0.3961                & 0.0930             & 0.0850                 \\
+         \hline
+         R2,Q2           & 0.0864                & 0.0973            & 0.7242                   \\
+    \hline
+       \end{tabular} $}
+    \end{center}
 
+
+    %%%% SENSOR %%%%%
+\begin{center}
+    \resizebox{.99 \columnwidth}{!}{ $
+    \begin{tabular}{ |c||c|c|c|  }
+        \hline
+        \multicolumn{4}{|c|}{Sensor} \\
+        \hline
+        Measured  & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+        \hline
+            R1,Q1           & 0.3986                & 1.1896                & 1.5352                 \\
+            \hline
+            % R1,Q2           & 0.1094                & 0.2694             & 0.4671                      \\
+            % \hline
+            R2,Q1           & 0.1577                &  0.5381           & 0.6675                         \\
+            % \hline
+            % R2,Q2           & 0.0514                & 0.1313             & 0.2549                   \\
+        \hline
+       \end{tabular} $}
+    \end{center}
 %%%%%%%%%%%% Caso 2 %%%%%%%%%%%%%
 %%%%%%%%%%%% Caso 2 %%%%%%%%%%%%%
 %%%%%%%%%%%% Caso 2 %%%%%%%%%%%%%
 
+
+%%%%%%%%%%%%%%%%%%%%%% 20 %%%%%%%%%%%%%%%%%
+\begin{center}
+    \resizebox{.99 \columnwidth}{!}{ $
+    \begin{tabular}{ |c||c|c|c|  }
+        \hline
+        \multicolumn{4}{|c|}{case 2: consensus rate = 20} \\
+        \hline
+        IMM  & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+        \hline
+        R1,Q1           & 0.1167                & 0.3027               & 0.7750                 \\
+            \hline
+            R1,Q2           & 0.1132                &  0.2847           & 0.6577                      \\
+            \hline
+            R2,Q1            & 0.0512                & 0.1325             & 0.2315                      \\
+            \hline
+            R2,Q2           & 0.0539                & 0.1454             & 0.2334                   \\
+        \hline
+        \multicolumn{4}{|c|}{} \\
+        \hline
+        W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+        \hline
+        R1,Q1        & 0.0771                & 0.0903             & 0.4918              \\
+        \hline
+        R1,Q2        & 0.1664                & 0.2726                & 1.0990              \\
+        \hline
+        R2,Q1           & 0.0771               &  0.0903           & 0.4918                         \\
+        \hline
+        R2,Q2           & 0.0804                & 0.0947            & 0.4190                   \\
+    \hline
+       \end{tabular} $}
+    \end{center}
+
+
+    %%%%%%%%%%%%%%%%% 10 %%%%%%%%%%%%%%%%%
+    \begin{center}
+        \resizebox{.99 \columnwidth}{!}{ $
+        \begin{tabular}{ |c||c|c|c|  }
+            \hline
+            \multicolumn{4}{|c|}{case 2: consensus rate = 10} \\
+            \hline
+            IMM  & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+            \hline
+            R1,Q1           & 0.1228                & 0.3438             & 0.5992                 \\
+                \hline
+                R1,Q2           & 0.1214                &  0.3291           & 0.7441                      \\
+                \hline
+                R2,Q1            & 0.0535                & 0.1536             & 0.2525                      \\
+                \hline
+                R2,Q2           & 0.0539                & 0.1439             & 0.2396                   \\
+            \hline
+            \multicolumn{4}{|c|}{} \\
+            \hline
+            W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+            \hline
+            R1,Q1        & 0.1566                & 0.1938             & 0.8766              \\
+            \hline
+            R1,Q2        & 0.1577                & 0.2278                & 2.4168              \\
+            \hline
+            R2,Q1           & 0.0742               &  0.0906          & 0.3968                         \\
+            \hline
+            R2,Q2           & 0.0759                & 0.0935            & 0.4782                   \\
+        \hline
+           \end{tabular} $}
+        \end{center}
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% 555555 %%%%%%%%%%%%%%%%
+        \begin{center}
+            \resizebox{.99 \columnwidth}{!}{ $
+            \begin{tabular}{ |c||c|c|c|  }
+                \hline
+                \multicolumn{4}{|c|}{case 2: consensus rate = 5} \\
+                \hline
+                IMM  & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+                \hline
+                    R1,Q1           & 0.1984                & 0.7467               & 2.3522                 \\
+                    \hline
+                    R1,Q2           & 0.1925                &  0.5871           & 2.2983                      \\
+                    \hline
+                    R2,Q1            & 0.0604                & 0.1829             & 0.4389                      \\
+                    \hline
+                    R2,Q2           & 0.0628                & 0.1873             & 0.2912                   \\
+                \hline
+                \multicolumn{4}{|c|}{} \\
+                \hline
+                W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+                \hline
+                R1,Q1        & 0.2135                & 0.7295            & 2.4394             \\
+                \hline
+                R1,Q2        & 0.2116                & 0.5412               & 2.7371              \\
+                \hline
+                R2,Q1           & 0.0722               &  0.1012           & 0.4599                         \\
+                \hline
+                R2,Q2           & 0.0742                & 0.1077            & 0.5699                  \\
+            \hline
+               \end{tabular} $}
+            \end{center}
+        
+    %%%%%%%%%%%%%%%%%%%%%%%%%       2          %%%%%%%%%%%%%%%%%%%%
+
+    \begin{center}
+        \resizebox{.99 \columnwidth}{!}{ $
+        \begin{tabular}{ |c||c|c|c|  }
+            \hline
+            \multicolumn{4}{|c|}{case 2: consensus rate = 2} \\
+            \hline
+            IMM  & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+            \hline
+            R1,Q1           & 0.6709                & 3.2770               & 8.4954                 \\
+                \hline
+                % R1,Q2           & 0.1132                &  0.2847           & 0.6577                      \\
+                % \hline
+                R2,Q1            & 0.1392               & 0.6907             & 2.0562                     \\
+                % \hline
+                % R2,Q2           & 0.0539                & 0.1454             & 0.2334                   \\
+            \hline
+            \multicolumn{4}{|c|}{} \\
+            \hline
+            W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+            \hline
+            R1,Q1        & 0.07629               & 2.5799             & 9.3296              \\
+            % \hline
+            % R1,Q2        & 0.1664                & 0.2726                & 1.0990              \\
+            \hline
+            R2,Q1           & 0.1585               &  0.5868           & 2.1211                         \\
+        %     \hline
+        %     R2,Q2           & 0.0804                & 0.0947            & 0.4190                   \\
+        % \hline
+           \end{tabular} $}
+        \end{center}
+
+        
+        %%%%%%%%%%%%%%%%%%%% 1 1 1 %%%%%%%%%%%%%%%%%%%%%%%%%
+
+        \begin{center}
+            \resizebox{.99 \columnwidth}{!}{ $
+            \begin{tabular}{ |c||c|c|c|  }
+                \hline
+                \multicolumn{4}{|c|}{case 2: consensus rate = 20} \\
+                \hline
+                IMM  & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+                \hline
+                R1,Q1           & 0.3883                & 2.3273               & 5.1490                 \\
+                    \hline
+                %     R1,Q2           & 0.1132                &  0.2847           & 0.6577                      \\
+                %     \hline
+                %     R2,Q1            & 0.0512                & 0.1325             & 0.2315                      \\
+                %     \hline
+                %     R2,Q2           & 0.0539                & 0.1454             & 0.2334                   \\
+                % \hline
+                \multicolumn{4}{|c|}{} \\
+                \hline
+                W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+                \hline
+                R1,Q1        & 0.3867                & 1.3242             & 5.3175              \\
+                % \hline
+                % R1,Q2        & 0.1664                & 0.2726                & 1.0990              \\
+                % \hline
+                % R2,Q1           & 0.0771               &  0.0903           & 0.4918                         \\
+                % \hline
+                % R2,Q2           & 0.0804                & 0.0947            & 0.4190                   \\
+            \hline
+               \end{tabular} $}
+            \end{center}
+
+            %%%%% NO cons %%%%%%%%%%%%%%%%
+
+            \begin{center}
+                \resizebox{.99 \columnwidth}{!}{ $
+                \begin{tabular}{ |c||c|c|c|  }
+                    \hline
+                    \multicolumn{4}{|c|}{} \\
+                    \hline
+                    W/O Cons  & Mean of means    & Max of means     & max of maxs  \\ 
+                    \hline
+                    R1,Q1        & 0.1784                & 0.2516             & 1.5541              \\
+                    \hline
+                    R1,Q2        & 0.1795                & 0.2145                & 0.9872              \\
+                    \hline
+                    R2,Q1           & 0.0845               &  0.0962           & 0.6888                         \\
+                    \hline
+                    R2,Q2           & 0.0843                & 0.1090            & 0.9289                   \\
+                \hline
+                   \end{tabular} $}
+                \end{center}
+            
+
+            %%%%%%%%%%%% SENSOR %%%%%%%%%%%%%%%%%%%
+
+            \begin{center}
+                \resizebox{.99 \columnwidth}{!}{ $
+                \begin{tabular}{ |c||c|c|c|  }
+                    \hline
+                    \multicolumn{4}{|c|}{Sensor} \\
+                    \hline
+                    Measure & Mean of means    & Max of means     & max of maxs  \\ [0.5ex]
+                    \hline
+                    R1,Q1           & 0.3985                & 1.2407               & 1.7790                 \\
+                        \hline
+                        % R1,Q2           & 0.1132                &  0.2847           & 0.6577                      \\
+                        % \hline
+                        R2,Q1            & 0.1574                & 0.5454             & 0.7139                     \\
+                        % \hline
+                        % R2,Q2           & 0.0539                & 0.1454             & 0.2334                   \\
+                    \hline
+                    
+                   \end{tabular} $}
+                \end{center}
+            
 \end{document}
