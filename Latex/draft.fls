@@ -186,7 +186,6 @@ INPUT c:/texlive/2019/texmf-dist/tex/latex/bbm-macros/ubbm.fd
 INPUT c:/texlive/2019/texmf-dist/fonts/tfm/public/bbm/bbm10.tfm
 INPUT c:/texlive/2019/texmf-dist/fonts/tfm/public/bbm/bbm7.tfm
 INPUT c:/texlive/2019/texmf-dist/fonts/tfm/public/bbm/bbm5.tfm
-INPUT c:/texlive/2019/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/Immagini/sensor_state_machine.png
 INPUT c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/Immagini/Sensor_state_machine.png
 INPUT c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/Immagini/Sensor_state_machine.png
@@ -199,6 +198,7 @@ INPUT c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/Immagini/2
 INPUT c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/Immagini/4sensor.png
 INPUT c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/Immagini/4sensor.png
 INPUT c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/Immagini/4sensor.png
+INPUT c:/texlive/2019/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT c:/Users/Lorenzo/Desktop/Cartelle/Git/IMM-Sensors-Network/Latex/draft.aux
 INPUT c:/Users/Lorenzo/.texlive2019/texmf-var/fonts/pk/ljfour/public/bbm/bbm10.600pk
 INPUT c:/texlive/2019/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
