@@ -112,11 +112,13 @@ Here we enumerate such allowed actions:
         \label{fig:number}
     \end{figure}
     \begin{itemize}
-        \item blue : 1 sensors ON, happens only at the conrners of the grid
+        \item blue : 1 sensors ON
         \item yellow : 2 sensors ON 
         \item orange : 3 sensors ON 
         \item red : 4 sensors ON 
     \end{itemize}
+    Note that the blue case happens only at the borders and corners of the grid.
+    \\
     Whenever the target is in range of a sensor at given timestep, the device takes a measurement.
     The model choosen for our sensor is a Radar, and as such the non-linear measurement function
      associated to it is the cartesian to polar transformation at timestep $k$, as shown below
@@ -366,16 +368,17 @@ The stochastic transition matrix in this case will be
 where $p_{0}$ and $q_{0}$ are fixed while $p$ and $q$ are computed to make the matrix stochastic.
 
 \section*{IMM}
-Being the agent's dynamic costantly switching between the models in the set choosen, a single kalman filter won't give us acceptable results while 
+Being the agent's dynamic costantly switching between the models in the set chosen, a single kalman filter won't give us acceptable results while 
 tracking and we have to rely on the Interacting Multiple Models algorithm (IMM). In essence the algorithm let various estimation filters work in parallel
  (EKF in our case), and outputs a mixture of the filters' estimate based on the probability of each of the models used in the filter to be correct.
  \\
 The hyphotheses we have to make in order to use the IMM are that the sequence of the true mode at timestep $k$, $s_{k}$, is a Markovian process, i.e. the mode evolves to the 
-memoryless random process $P\{s_{k+1}^{j}|s_{k}^{i}\}\pi_{ji}$ $\forall\ j,i$ and that the model set $\mathbbm{M}$ is the correct one and is time-invariant.
+memoryless random process $P\{s_{k+1}^{(j)}|s_{k}^{(j)}\}\pi_{ji}$ $\forall\ j,i$ and that the model set $\mathbbm{M}$ is the correct one and is time-invariant.
 In our case those hypotheses are known to be true.
 \\
- The design parameters of the IMM are the model set $\mathbbm{M}$, the process and measurement noise spectral density matrices $Q$ and $R$, the initial 
- state and covariance $\hat{x}_{0|0}$ and $P_{0|0}$ and the transition matrix $T$ containing all the $\pi_{ji}$.
+ The design parameters of the IMM are the model set $\mathbbm{M}$, the process and measurement noise spectral density 
+ matrices $Q$ and $R$ for each model and sensor, the initial state and covariance $\hat{x}_{0|0}$ and $P_{0|0}$ 
+ and the transition matrix $T$ containing all the $\pi_{ji}$.
  The algorithm can be subdivided in 4 subsections, :
  \begin{itemize}
      \item Model Conditioned reinitialization $\forall m_{i},m_{j}\in \mathbbm{M}$
@@ -384,21 +387,30 @@ In our case those hypotheses are known to be true.
                 &\mu^{(j|i)}_{k-1}=\pi_{ji}\mu^{(j)}_{k-1}/\mu^{(i)}_{k|k-1}\\
                 &\bar{x}^{(i)}_{k-1|k-1}=\sum_{j}\hat{x}^{(j)}_{k-1|k-1}\mu^{j|i}_{k-1}\\
                 &\bar{P}^{(i)}_{k-1|k-1}=\sum_{j}[P^{(j)}_{k-1|k-1}+(\bar{x}^{(i)}_{k-1|k-1}\\
-                &-\hat{x}^{(j)}_{k-1|k-1})(\bar{x}^{(i)}_{k-1|k-1}-\hat{x}^{(j)}_{k-1|k-1})']\mu_{k-1}^{j|i}
+                &-\hat{x}^{(j)}_{k-1|k-1})(\bar{x}^{(i)}_{k-1|k-1}-\hat{x}^{(j)}_{k-1|k-1})^{T}]\mu_{k-1}^{j|i}
     \end{align*}
-        Here we take all the model probabilities computed at the previous step and mix them together with the 
+        Here we take all the output model probabilities computed at the previous iteration of the IMM and mix them together with the 
         transition matrix to then use the result to combine both the previous step state and covariance estimation.
      \item Model Conditioned filtering, in our case EKF $\forall m_{i}\in \mathbbm{M}$
         \begin{align*}
-            &\\
-            &\\
-            &\\
-            &\\
-            &\\
-            &\\
+            &\hat{x}^{(i)}_{k|k-1}=f^{(i)}_{k}(\bar{x}^{(i)}_{k-1|k-1})\\
+            &P^{(i)}_{k|k-1}=F^{(i)}_{k-1}\bar{P}^{(i)}_{k-1|k-1}F^{(i)^{T}}_{k-1}+G^{(i)}_{k-1}Q_{k-1}^{(i)}G^{(i)^{T}}_{k-1}\\
+            &\bar{z}^{(i)}_{k}=z_{k}-h(\hat{x}^{(i)}_{k|k-1})\\
+            &S^{(i)}_{k}=H^{(i)}_{k}P^{(i)}_{k|k-1}H^{(i)^{T}}_{k}+R^{(i)}_{k}\\
+            &W^{(i)}_{k}=P^{(i)}_{k|k-1}H^{(i)^{T}}_{k}S^{(i)^{-1}}_{k}\\
+            &\hat{x}^{(i)}_{k|k}=\hat{x}^{(i)}_{k|k-1}+W^{(i)}_{k}\bar{z}^{(i)}_{k}\\
+            &P^{(i)}_{k|k}=P^{(i)}_{k|k-1}-W^{(i)}_{k}S^{(i)}_{k}W^{(i)^{T}}_{k}
         \end{align*}
      \item Model Probability update $\forall m_{i},m_{j}\in \mathbbm{M}$
+        \begin{align*}
+            &L^{(i)}_{k}=\mathcal{N}(\bar{z}^{(i)}_{k},0,S^{(i)}_{k})\\
+            &\mu^{(i)}_{k}=\frac{\mu^{(i)}_{k|k-1}L^{(i)}_{k}}{\sum_{j}\mu^{(j)}_{k|k-1}L^{(j)}_{k}}
+        \end{align*}
      \item Estimate fusion
+        \begin{align*}
+         &\hat{x}_{k|k}=\sum_{i}x^{(i)}_{k|k}\mu^{(i)}_{k}\\
+         &P_{k|k}=\sum_{i}[P^{(i)}_{k|k}+(\hat{x}_{k|k}-\hat{x}^{(i)}_{k|k})(\hat{x}_{k|k}-\hat{x}^{(i)}_{k|k})^{T}]\mu_{k}^{i}
+     \end{align*}
  \end{itemize}
 \section*{Consensus}
     Right having computed the IMM's estimate for every ON sensor, we use a consensus algorithm to try to lower the 
