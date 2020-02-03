@@ -1,12 +1,12 @@
 # Fdb version 3
-["bibtex draft"] 1580674664 "draft.aux" "draft.bbl" "draft" 1580674670
+["bibtex draft"] 1580674664 "draft.aux" "draft.bbl" "draft" 1580678827
   "C:/Program Files/MiKTeX 2.9/bibtex/bst/bibtex/ieeetr.bst" 1291864344 18361 1a00e58565e7f19bf2b3e1bfb82254ae ""
   "bib.bib" 1580661915 336 301044e36b267ca814f3d7f20633b349 ""
-  "draft.aux" 1580674668 4259 9d453628baa155fae5c1895ee43751ea "pdflatex"
+  "draft.aux" 1580678826 4259 9d453628baa155fae5c1895ee43751ea "pdflatex"
   (generated)
   "draft.bbl"
   "draft.blg"
-["pdflatex"] 1580674665 "draft.tex" "c:/Users/erikz/Downloads/IMM-Sensors-Network-no_speed_jumps_final/IMM-Sensors-Network-no_speed_jumps/Latex/draft.pdf" "draft" 1580674670
+["pdflatex"] 1580678824 "draft.tex" "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/draft.pdf" "draft" 1580678827
   "C:/Program Files/MiKTeX 2.9/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1233951848 1004 54797486969f23fa377b128694d548df ""
   "C:/Program Files/MiKTeX 2.9/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1233951848 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
   "C:/Program Files/MiKTeX 2.9/fonts/tfm/public/cm/cmbx12.tfm" 1136765053 1324 c910af8c371558dc20f2d7822f66fe64 ""
@@ -134,13 +134,13 @@
   "Immagini/maxIMMC2_1R2Q1.png" 1580661074 50174 42f8d8d292b7c7f109ad7e9480ac4732 ""
   "Immagini/maxIMMC2_20R2Q1.png" 1580593117 67779 33dd2de863ff0a16ff8c2c52ba278de0 ""
   "Immagini/sensor_state_machine.png" 1580661083 27925 962786d084337ccc8cde8601c7623a99 ""
-  "c:/Users/erikz/Downloads/IMM-Sensors-Network-no_speed_jumps_final/IMM-Sensors-Network-no_speed_jumps/Latex/draft.aux" 1580674668 4259 9d453628baa155fae5c1895ee43751ea ""
-  "draft.aux" 1580674668 4259 9d453628baa155fae5c1895ee43751ea "pdflatex"
+  "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/draft.aux" 1580678826 4259 9d453628baa155fae5c1895ee43751ea ""
+  "draft.aux" 1580678826 4259 9d453628baa155fae5c1895ee43751ea "pdflatex"
   "draft.bbl" 1580674665 284 26907e362e314e3e1b6d2c650c5f7d96 "bibtex draft"
-  "draft.tex" 1580674657 50120 4725b276595c41a29d971b3b1b457e6b ""
+  "draft.tex" 1580678822 50109 deda9ee9467c75751bd57d036c14dab2 ""
   (generated)
-  "c:/Users/erikz/Downloads/IMM-Sensors-Network-no_speed_jumps_final/IMM-Sensors-Network-no_speed_jumps/Latex/draft.log"
-  "draft.log"
   "draft.aux"
-  "c:/Users/erikz/Downloads/IMM-Sensors-Network-no_speed_jumps_final/IMM-Sensors-Network-no_speed_jumps/Latex/draft.pdf"
+  "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/draft.log"
   "draft.pdf"
+  "c:/Users/erikz/OneDrive/Desktop/PaioPaio2/IMM-Sensors-Network/Latex/draft.pdf"
+  "draft.log"

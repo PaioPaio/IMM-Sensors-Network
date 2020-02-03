@@ -6,7 +6,7 @@
 \usepackage{hyperref} % Add a link to your document
 \usepackage{graphicx} % Add pictures to your document
 \usepackage{listings} % Source code formatting and highlighting
-\usepackage{bookmark}
+\usepackage{bookmark} 
 %\usepackage{natbib}
 \usepackage{geometry}
 \usepackage{bbm}
@@ -129,7 +129,7 @@ associated to it is the cartesian to polar transformation at timestep $k$, as sh
         \rho(k) \\ \theta (k)(k)
     \end{bmatrix}=
     \begin{bmatrix}
-        \sqrt{x_{1}(k)^2+x_{2}(k)^2} \\ atan2(x_{2}(1)/x_{1}(k))
+        \sqrt{x_{1}(k)^2+x_{2}(k)^2} \\ atan2(x_{2}(k)/x_{1}(k))
     \end{bmatrix} +
     \begin{bmatrix}
         v_{1}(k) \\v_{2}(k)
@@ -295,8 +295,8 @@ By defining
 \begin{equation*}
     \resizebox{.99\columnwidth}{!}{ $ x=\begin{bmatrix} x(k) \\ y(k) \\ v_{t}(k) \\ \alpha(k) \\ \end{bmatrix}
             A(x(k))=\begin{bmatrix}
-                1 & 0 & \delta cos(\dot{\alpha (k)}) & 0                            \\
-                0 & 1 & 0                            & \delta sin(\dot{\alpha (k)}) \\
+                1 & 0 & \delta cos(\alpha (k)) & 0                            \\
+                0 & 1 & 0                            & \delta sin(\alpha (k)) \\
                 0 & 0 & 1                            & 0                            \\
                 0 & 0 & 0                            & 1                            \\
             \end{bmatrix}
