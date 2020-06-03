@@ -1,19 +1,20 @@
 classdef Sensor<handle
     properties
        range {}                 %how far can the sensor work
-       R {}                     %diagonal cuz we cool
+       R {}                     %diagonal 
        
        sensed {}                %[distance,angle]
        
        position {}              %position of the sensor in the room
        ingrid {}                %indices in the grid
        
-       inrange=false            %pretty selfexplanatory
+       inrange=false            %check on range
        state {}                 %on/idle/off
        neighboors {}            %cell array with indices of listeners/sources
        activevertex{}           %active graph indices
        
-       change {}                
+       change {} 
+       color {}                 % for plot
        %token that should be -1 if a neighboor has gone from ON to IDLE,
        % 1 if it has gone from IDLE to ON, 0 in any other case
        
@@ -73,7 +74,15 @@ classdef Sensor<handle
                 obj.sensed=[sqrt(vector*vector');actualangle]+randn(2,1).*arrayfun(@(a)sqrt(a),diag(obj.R));
             end
         end
-        
+        function obj=plotsensor(obj)
+            if obj.state=="on"
+                plot(obj.position(1),obj.position(2),'*g');
+            elseif obj.state=="idle"
+                plot(obj.position(1),obj.position(2),'*y');
+            elseif obj.state=="off"
+                plot(obj.position(1),obj.position(2),'*r');
+            end
+        end
         function obj=checkchange(obj)
             %checks events nearby
             if obj.change==1
@@ -127,8 +136,7 @@ classdef Sensor<handle
                 %all the kalman estimates
                 xpred1=[xpred1;sensorgrid{kk,ll}.xpred];
                 wantPpred{i}(:,:,:)=sensorgrid{kk,ll}.Ppred;
-                mu1=[mu1;sensorgrid{kk,ll}.mu];
-                muijg=blkdiag(muijg,sensorgrid{kk,ll}.muij);
+                mu1=[mu1,sensorgrid{kk,ll}.mu];
                 Hcons=[Hcons;eye(lungstato)];
                 Hmu=[Hmu;eye(nummarkov)];
             end
@@ -138,7 +146,7 @@ classdef Sensor<handle
             %H is gonna be a stacked matrix of identities since our measure
             %is exactly zmix
             [obj.xcons,obj.Pcons]=WLS(xcons1,covmix,Hcons);
-            [obj.mu,obj.muij]=WLS(mu1,muijg,Hmu);
+            obj.mu=mean(mu1,2);
             %kalman
             for j=1:nummarkov
                 Cpred=[];

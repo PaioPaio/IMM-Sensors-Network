@@ -1,41 +1,28 @@
-function varargout = checkvertex(cellarr,arr)
+function A = checkvertex(cellarr,arr)
 %check if in the cell array cellarr there's a match for the array arr, if
 %arr is actually a cell then it checks for all of the arrays inside.
 %optionally outputs out also the indices in which there was a match
-nOutputs = nargout;
-varargout = cell(1,nOutputs);
-a=size(cellarr,1);
-b=size(cellarr,2);
+a=length(cellarr);
 if iscell(arr)
-    indic={};
-    c=length(arr);
-    A=zeros(a,b,c);
-    for i=1:c
+    b=length(arr);
+    A=zeros(a,b);
+    for i=1:b
         arr1=arr{i};
-        for k=1:size(cellarr,1)
-            for j=1:size(cellarr,2)     
-                if cellarr{k,j}==arr1
-                    A(i,k,j)=1;
-                    indic{end+1}=[k,j];
-                end
+        for k=1:a
+            if cellarr{k}==arr1
+                A(k,i)=1;
             end
         end
     end
 else
-    indic={};
-    A=zeros(a,b);
+    A=zeros(1,a);
     for i=1:size(cellarr,1)
-        for j=1:size(cellarr,2)     
+        for j=1:size(cellarr,2)
             if cellarr{i,j}==arr
                 A(i,j)=1;
-                indic{end+1}=[i,j];
             end
         end
     end
-end
-varargout{1}=A;
-if nOutputs==2
-    varargout{2}=indic;
 end
 end
 
